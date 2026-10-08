@@ -1,0 +1,30 @@
+Zespół
+Lider
+Nazwa
+Temat : Gra 3D RPG
+
+GitHub
+README.MD
+
+
+Harmonogram zajęć i kryteria zaliczenia projektu
+
+Koncepcja i projekt aplikacji. Wybór tematu, określenie wymagań funkcjonalnych (MVP), podział zadań w zespole, identyfikacja głównych zasobów/encji i relacji między nimi, wstępny projekt API, makiety najważniejszych widoków i mapa nawigacji, utworzenie repozytorium Git.
+Podstawowe API. Inicjalizacja backendu (Node.js + Express), konfiguracja routingu i middleware, pierwsze endpointy REST, podstawowa walidacja i obsługa błędów. Na tym etapie dane mogą być przechowywane w pamięci lub plikach. Testowanie API za pomocą wybranego klienta HTTP. (10 pkt.)
+Baza danych i kompletne API. Konfiguracja warstwy dostępu do danych (SQLite jako rozwiązanie bazowe; inne DB po uzgodnieniu), implementacja trwałego CRUD i właściwej dla projektu logiki biznesowej, wyszukiwania/filtrowania/sortowania tam, gdzie ma to zastosowanie. Walidacja danych, osługa błędów w API. (10 pkt.)
+Uwierzytelnianie i finalizacja backendu. Rejestracja i logowanie użytkowników, bezpieczne przechowywanie haseł. Uwierzytelnianie i autoryzacja (np. sesje lub JWT), ochrona zasobów, role/uprawnienia tam, gdzie są uzasadnione. Testy najważniejszych przypadków użycia API. Dokumentacja API. Na zakończenie etapu backend powinien realizować komplet funkcjonalności wymaganych przez MVP. (10 pkt.)
+Frontend i integracja z API. Inicjalizacja aplikacji Vue. Podział interfejsu na komponenty, implementacja głównych widoków i Vue Router. Komunikacja z przygotowanym API. Formularze, prezentacja danych, stany ładowania i obsługa błędów. Implementacja podstawowych scenariuszy użytkownika end-to-end. (10 pkt.)
+Kompletna aplikacja i funkcjonalność rozszerzona. Dokończenie interfejsu i integracji wszystkich funkcji MVP. Zarządzanie stanem aplikacji (np. Pinia) tam, gdzie jest potrzebne. Integracja uwierzytelniania z frontendem. Responsywność i dopracowanie UX. Implementacja co najmniej jednej uzasadnionej funkcjonalności/technologii rozszerzonej (np. WebSocket/SSE, PWA/Service Worker, IndexedDB, Web Worker albo innej po ustaleniu z prowadzącym). Testy i poprawki. (10 pkt.)
+Finalizacja i prezentacja projektu. Przygotowanie wersji końcowej aplikacji. Porządki w repozytorium i dokumentacji, instrukcja uruchomienia/deployment. Prezentacja działania aplikacji i najważniejszych decyzji projektowych. Omówienie wkładu członków zespołu oraz problemów napotkanych podczas realizacji. (50 pkt.)
+Realizacja wymagań i działanie aplikacji - 10 pkt
+Jakość rozwiązania technicznego - 10 pkt
+sensowny podział na moduły/komponenty, czytelność i spójność kodu, poprawne wykorzystanie frameworków
+Bezpieczeństwo i poprawność obsługi danych - 5 pkt
+UI, UX i jakość interfejsu - 5 pkt
+responsywność, spójność interfejsu, czytelność, poprawność formularzy i komunikatów, informowanie o błędach i trwających operacjach, sensowną nawigację oraz brak elementów ewidentnie utrudniających korzystanie z aplikacji
+Rozszerzenie techniczne - 10 pkt
+Wykorzystanie co najmniej jednego mechanizmu wykraczającego poza podstawowy stos omawiany na zajęciach. Rozszerzenie powinno mieć uzasadnienie w funkcjonalności aplikacji i być poprawnie zintegrowane z pozostałą częścią systemu.
+Dokumentacja, prezentacja, obrona - 10 pkt
+Dokumentacja: plik README z krótkim opisem aplikacji, głównych funkcje, struktury plików, instrukcją uruchomienia, zrzuty ekranu.
+Prezentacja: demo aplikacji w typowych scenariuszach użytkownika, omówienie wybranych fragmentów kodu, decyzji projektowych, problemów i ich rozwiązań, podziału pracy w zespole (przy ocenianiu pod uwagę będzie brany również indywidualny wkład członków zespołu).
+Wszelkie plagiaty, kopiowanie kodu bez zrozumienia i fragmenty kodu wygenerowane przez sztuczną inteligencję skutkują niezaliczeniem.
