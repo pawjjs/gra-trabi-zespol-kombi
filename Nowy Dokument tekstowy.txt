@@ -1,7 +1,11 @@
-Zespół
-Lider
-Nazwa
-Temat : Gra 3D RPG
+Zespół :
+	@ Mateusz Tręda
+	@ Ernest
+	@ Karol Daniło
+
+Lider : Mateusz
+Nazwa : PlatiniumGames
+Temat : Gra MMORPG
 
 GitHub
 README.MD
