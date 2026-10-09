@@ -1,8 +1,12 @@
 import express from 'express';
 
 const app = express();
-// Kolor klocka gracza (format CSS, rozumie go THREE.Color)
 const PLAYER_COLOR = '#1dfa00';
+
+//app.get('/', (req, res) => 
+//{
+//    res.json({ message: 'Siema siema' });
+//});
 
 app.get('/api/hello', (req, res) => 
 {
