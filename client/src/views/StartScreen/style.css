@@ -1,0 +1,133 @@
+.title-wrapper{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 5vw;
+}
+header.title{
+    display: flex;
+    align-items: center;
+    align-content: center;
+    gap: 1vw;
+    justify-content: center;
+}
+p.glitchN,
+p.glitchI,
+p.glitchE,
+p.glitchR{
+    --moveX: 0.2vw;
+    --moveY: 0.2vw;
+    --duration: 0.3s;
+    --delay: 0s;
+    position: relative;
+    font-size: 8.6vw;
+    color: white;
+}
+p.glitchN::after,
+p.glitchN::before,
+p.glitchI::after,
+p.glitchI::before,
+p.glitchE::after,
+p.glitchE::before,
+p.glitchR::after,
+p.glitchR::before{
+    display: block;
+    content: attr(data-text);
+    position: absolute;
+    top:0;left:0;
+    opacity: 0.8;
+}
+p.glitchN::before,
+p.glitchI::before,
+p.glitchE::before,
+p.glitchR::before{
+    animation: glitch-it var(--duration) cubic-bezier(0.25, 0.48, 0.45, 0.94 ) var(--delay) both infinite;
+    color: rgb(82, 206, 255);
+    z-index: -1;
+}
+p.glitchN::after,
+p.glitchI::after,
+p.glitchE::after,
+p.glitchR::after{
+    animation: glitch-it var(--duration) cubic-bezier(0.25, 0.48, 0.45, 0.94 ) var(--delay) reverse infinite;
+    color: rgb(255, 14, 255);
+    z-index: -2;
+}
+p.glitchN{
+    --duration: 0.4s;
+    --delay : 0s;
+    --moveX:0.21vw;
+    --moveY:0.2vw;
+}
+p.glitchI{
+    --duration: 0.31s;
+    --delay : 0s;
+    --moveX:0.18vw;
+    --moveY:0.2vw;
+}
+p.glitchR{
+    --duration: 0.31s;
+    --delay : 0s;
+    --moveX:0.2vw;
+    --moveY:0.19vw;
+}
+@keyframes glitch-it{
+    0%{
+        transform: translate( calc(-1*var(--moveX))  ,var(--moveY));
+    }
+    20%{
+        transform: translate(var(--moveX),calc(-1*var(--moveY)));
+    }
+    60%{
+        transform: translate(var(--moveX),var(--moveY));
+    }
+    to
+    {
+        transform: translate(0);
+    }
+}
+b.glitchJ,
+b.glitchS{
+    position: relative;
+    font-size: 8.6vw;
+    color: rgb(0, 0, 0);
+    background-color: yellow;
+    padding: 0.5vw;
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    
+}
+b.glitchJ{
+    display: inline-block;
+    animation: displayJ 1.31s infinite;
+}
+b.glitchS{
+    display: inline-block;
+    animation: displayS 2.05s infinite;
+}
+@keyframes displayJ {
+  0%, 96.77% {
+    opacity: 1;
+  }
+
+  96.78%, 100% {
+    opacity: 0;
+  }
+}
+@keyframes displayS {
+  0%, 95.77% {
+    opacity: 1;
+  }
+
+  95.78%, 100% {
+    opacity: 0;
+  }
+}
+/*///////////////////////////////////////////////////////////////////////////////////////*/
+.start-form{
+    width: 40vw;
+    min-height: 25vw;
+    background-color: aliceblue;
+}

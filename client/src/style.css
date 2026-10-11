@@ -15,13 +15,13 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 100vw;
+  width: 100%;
   min-height: 100vh;
   min-width: 100svh;
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
-  background-image: url('/public/backgrounds2D/thumb-1920-655992.jpg');
+  background-image: url('/backgrounds2D/thumb-1920-655992.jpg');
 }
 
 .skylight-container{
@@ -32,6 +32,8 @@
 .screen-menu{
   position: relative;
   z-index: 1;
+  width: 100%;
+  height: 100vh;
 }
 
 .skylight 
@@ -41,12 +43,11 @@
   --wobble-time: 2.3s;
   --lightPower: 1;
   --lightSize: 2px;
-
   position: fixed;
   top: 50%;
   left: 0;
-  width: 10px;
-  height: 10px;
+  width: 1vw;
+  height: 1vw;
   opacity: 0;
 
   will-change: transform, translate;
@@ -60,7 +61,6 @@
   --waveDelay: 0s;
   --delay: 0s;
   animation-delay: var(--delay), var(--waveDelay);
-  
 }
 
 @keyframes driftX {
@@ -86,10 +86,9 @@
     rgba(255, 255, 255, var(--lightPower)) 100%
   );
   box-shadow:
-    0 0 6px var(--lightSize) rgba(255, 255, 255),
-    0 0 16px 5px rgba(255, 255, 255, 0.514);
+    0 0 1vw var(--lightSize) rgba(255, 255, 255),
+    0 0 0.3vw 0.1vw rgba(255, 255, 255, 0.514);
   scale: 1;
-
   animation: wobble var(--wobble-time) ease-in-out infinite alternate;
   animation-delay: var(--wave-delay);
 }

@@ -1,15 +1,18 @@
 <script setup>
 import './style.css'
+import { onMounted } from 'vue';
+import { initializeApp } from 'firebase/app';
+
+onMounted(async () => {
+  const res = await fetch('/api/firebase-config');
+  const firebaseApp = initializeApp(await res.json());
+  console.log('Firebase działa:', firebaseApp.options.projectId);
+});
 </script>
 
 <template>
   <div class="screen-wrapper">
     <div class="screen-menu">  
-      <nav>
-        <RouterLink to="/hello">Hello</RouterLink> |
-        <RouterLink to="/goodbye">Goodbye</RouterLink> |
-        <RouterLink to="/game">Graj</RouterLink>
-      </nav>
       <RouterView />
     </div>
     <div class="screen-background">
@@ -23,20 +26,8 @@ import './style.css'
       </div>
     </div>
   </div>
-<!-- 
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
---> 
 </template>
+
+
+
+
