@@ -6,7 +6,7 @@ import GameView from './views/GameView.vue';
 export default createRouter({
   history: createWebHistory(),
   routes: [
-    { path: '/', component: HelloWorld },
+    { path: '/hello', component: HelloWorld },
     { path: '/goodbye', component: GoodbyeWorld },
     { path: '/game', component: GameView },
   ],
