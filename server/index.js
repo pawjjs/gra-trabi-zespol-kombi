@@ -2,12 +2,17 @@ import express from 'express';
 import { firebaseConfig }  from './firebase.js';
 import { getFirestore } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
+import { useAuth } from "./hooks/useAuth.js";
 
 const app = express();
 
-app.get('/api/firebase-config', (req, res) => 
+app.get('/api/firebase-config', (request, response) => 
 {
-    res.json(firebaseConfig);
+    response.json(firebaseConfig);
+});
+app.get('/api/firebase-auth', (request , response) => 
+{
+    response.json(useAuth());
 });
 
 

@@ -4,17 +4,24 @@ Zespół :
 	@ Karol Daniło
 
 Lider : Mateusz
-Nazwa : PlatiniumGames
+Nazwa : GraITrąbi zespół Kombi
 Temat : Gra MMORPG
 
 GitHub
 README.MD
 
 
-Harmonogram zajęć i kryteria zaliczenia projektu
 
-Koncepcja i projekt aplikacji. Wybór tematu, określenie wymagań funkcjonalnych (MVP), podział zadań w zespole, identyfikacja głównych zasobów/encji i relacji między nimi, wstępny projekt API, makiety najważniejszych widoków i mapa nawigacji, utworzenie repozytorium Git.
-Podstawowe API. Inicjalizacja backendu (Node.js + Express), konfiguracja routingu i middleware, pierwsze endpointy REST, podstawowa walidacja i obsługa błędów. Na tym etapie dane mogą być przechowywane w pamięci lub plikach. Testowanie API za pomocą wybranego klienta HTTP. (10 pkt.)
+
+ określenie wymagań funkcjonalnych (MVP),
+  podział zadań w zespole, 
+  identyfikacja głównych zasobów/encji i relacji między nimi, wstępny projekt API, 
+   mapa nawigacji,
+
+
+Podstawowe API. 
+
+Inicjalizacja backendu (Node.js + Express), konfiguracja routingu i middleware, pierwsze endpointy REST, podstawowa walidacja i obsługa błędów. Na tym etapie dane mogą być przechowywane w pamięci lub plikach. Testowanie API za pomocą wybranego klienta HTTP. (10 pkt.)
 Baza danych i kompletne API. Konfiguracja warstwy dostępu do danych (SQLite jako rozwiązanie bazowe; inne DB po uzgodnieniu), implementacja trwałego CRUD i właściwej dla projektu logiki biznesowej, wyszukiwania/filtrowania/sortowania tam, gdzie ma to zastosowanie. Walidacja danych, osługa błędów w API. (10 pkt.)
 Uwierzytelnianie i finalizacja backendu. Rejestracja i logowanie użytkowników, bezpieczne przechowywanie haseł. Uwierzytelnianie i autoryzacja (np. sesje lub JWT), ochrona zasobów, role/uprawnienia tam, gdzie są uzasadnione. Testy najważniejszych przypadków użycia API. Dokumentacja API. Na zakończenie etapu backend powinien realizować komplet funkcjonalności wymaganych przez MVP. (10 pkt.)
 Frontend i integracja z API. Inicjalizacja aplikacji Vue. Podział interfejsu na komponenty, implementacja głównych widoków i Vue Router. Komunikacja z przygotowanym API. Formularze, prezentacja danych, stany ładowania i obsługa błędów. Implementacja podstawowych scenariuszy użytkownika end-to-end. (10 pkt.)
