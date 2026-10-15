@@ -2,7 +2,7 @@
 
 
 
-!\[](Poster.jpg)
+![](Poster.jpg)
 
 
 
