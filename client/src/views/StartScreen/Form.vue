@@ -148,14 +148,6 @@ const handleSubmitRegister = async (e) =>{
 
     //TODO : Add avatar file from MongoDB
 
-    //if (file !== undefined) {
-    //    const fileReF = ref(storage, `Avatars/${file_id}`)
-    //    uploadBytes(fileReF, imageUpload)
-    //      .then(() => {
-    //        console.log('UPLOADED FILE');
-    //      });
-    //  }
-
     console.log("Register Succes");
   } 
   catch (error) 

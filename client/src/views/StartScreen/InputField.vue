@@ -7,11 +7,6 @@ const props = defineProps
   small: { type: String, default: '' },
   error: { type: String, default: '' }
 });
-//const emit = defineEmits(['update:modelValue']);
-
-//function onInput(e) {
-//  emit('update:modelValue', props.type === 'file' ? (e.target.files[0] ?? null) : e.target.value);
-//}
 </script>
 
 <template>
