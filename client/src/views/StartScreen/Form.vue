@@ -125,30 +125,22 @@ const handleSubmitRegister = async (e) =>{
       throw invalid
     }
     errors.isPasswordStrong = '';
-    //backend
-    const auth = getAuth(); 
-    await createUserWithEmailAndPassword(auth, email.value, password.value);
-    const user = auth.currentUser;
-    if (user) 
-    {
-      const res = await fetch('/api/firebase-config');
-      const firebaseApp = initializeApp(await res.json());
-      const db = getFirestore(firebaseApp);
-      await setDoc(doc(db, 'Users', user.uid),
-      {
-        email: user.email,
-        playerNick: nick.value,
-        //avatar: file_id,
-        online: true,
-        assigned: '',
-        ping: serverTimestamp()
-      });
-    }
-    //backend
-
+    const form = e.target;
+    const formData = new FormData(form);
+    const values = Object.fromEntries(formData.entries());
     //TODO : Add avatar file from MongoDB
-
-    console.log("Register Succes");
+    const response = await fetch('/api/firebase/register', 
+    {
+      method: form.method.toUpperCase(),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(values), 
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) 
+    {
+      throw data.message || response.statusText;
+    }
+    console.log("Register Success");
   } 
   catch (error) 
   {
@@ -156,24 +148,25 @@ const handleSubmitRegister = async (e) =>{
     toastNotify(message);
   }
 }
+
 const handleSubmitLogin = async (e) => {
   e.preventDefault();
   try 
   {
-    //backend
-    const auth = getAuth(); 
-    await signInWithEmailAndPassword(auth, email.value, password.value);
-    const res = await fetch('/api/firebase-config');
-    const firebaseApp = initializeApp(await res.json());
-    const db = getFirestore(firebaseApp);
-    const UserRef = doc(db, 'Users', auth.currentUser.uid);
-    const UserSnap = await getDoc(UserRef);
-    if (UserSnap.exists()) {
-      await updateDoc(UserRef, {
-        online: true
-      })
+    const form = e.target;
+    const formData = new FormData(form);
+    const values = Object.fromEntries(formData.entries());
+    const response = await fetch('/api/firebase/login', 
+    {
+      method: form.method.toUpperCase(),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(values), 
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) 
+    {
+      throw data.message || response.statusText;
     }
-    //backend
     console.log("Login Success");
   } 
   catch (error) 
@@ -182,19 +175,18 @@ const handleSubmitLogin = async (e) => {
   }
 }
 
-
-
 </script>
 
 <template>
   <div class="auth">
     <h2 class="form-label">{{ isRegister ? 'Register' : 'Login' }}</h2>
     <div v-if="isRegister">
-      <form enctype='multipart/form-data' novalidate @submit.prevent="handleSubmitRegister">
+      <form method="POST" enctype='multipart/form-data' novalidate @submit.prevent="handleSubmitRegister">
         <InputField label-name="Nickname" small="Glory to Mankind">
           <template #body>
             <input 
               type="text" 
+              name="form_nick"
               placeholder="Enter you name" 
               v-model="nick"
             />
@@ -231,6 +223,7 @@ const handleSubmitLogin = async (e) => {
         <template #body>
           <input 
             type="password" 
+            name="form_password"
             placeholder="********" 
             v-model="password"
           />
@@ -241,7 +234,7 @@ const handleSubmitLogin = async (e) => {
     </div>
     <!--//////////////////////////////////////////////////////////////////////////////////////////////-->
     <div v-else>
-      <form novalidate @submit.prevent="handleSubmitLogin">
+      <form method="POST" novalidate @submit.prevent="handleSubmitLogin">
           <InputField label-name="Email" >
           <template #body>
             <input
@@ -257,6 +250,7 @@ const handleSubmitLogin = async (e) => {
           <template #body>
             <input 
               type="password" 
+              name="form_password"
               placeholder="********" 
               v-model="password"
             />

@@ -1,10 +1,24 @@
-import express from 'express';
+import express, { request, response } from 'express';
 import { firebaseConfig }  from './firebase.js';
 import { getFirestore } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { useAuth } from "./hooks/useAuth.js";
+import { useRegisterFirebaseUser } from './hooks/useRegisterFirebaseUser.js';
+import { useLoginFirebaseUser } from './hooks/useLoginFirebaseUser.js';
 
 const app = express();
+app.use(express.json());//Middleware ability thats gives POST data as JSON's
+//Parsowanie ciała żądania w formacie JSON:
+
+//Serwowanie statycznych plików:
+//app.use(express.static('public'));
+
+/*app.use((err, req, res, next) => 
+{
+  res.status(500).json({
+    message: err.message
+  });
+});*/
 
 app.get('/api/firebase-config', (request, response) => 
 {
@@ -13,6 +27,40 @@ app.get('/api/firebase-config', (request, response) =>
 app.get('/api/firebase-auth', (request , response) => 
 {
     response.json(useAuth());
+});
+
+app.post('/api/firebase/register', async (request, response) => 
+{
+  const name = request.body.form_nick;
+  const email = request.body.form_email;
+  const password = request.body.form_password;
+  try
+  {
+    await useRegisterFirebaseUser(name,email,password); 
+    response.status(201).json({ ok: true });
+  }
+  catch(err)
+  {
+    return response.status(500).json({
+      message: typeof err === 'string' ? err : err?.message || 'Something went wrong',
+    });
+  }
+});
+
+app.post('/api/firebase/login', async (request, response) => {
+  const email = request.body.form_email;
+  const password = request.body.form_password;
+  try 
+  {
+    await useLoginFirebaseUser(email,password);
+    response.status(200).json({ ok: true });
+  } 
+  catch (err) 
+  {
+    return response.status(500).json({
+      message: typeof err === 'string' ? err : err?.message || 'Something went wrong',
+    });
+  }
 });
 
 
