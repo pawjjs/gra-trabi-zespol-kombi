@@ -19,4 +19,3 @@ import './style.css'
         </div>
     </div>
 </template>
-

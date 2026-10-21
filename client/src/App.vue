@@ -1,19 +1,22 @@
 <script setup>
-import './style.css'
+import './style.css';
+import { useFirebase } from './store/firebase';
 import { onMounted } from 'vue';
-import { initializeApp } from 'firebase/app';
+import { useAuth , provideAuth} from './hooks/useAuth.js';
 
-onMounted(async () => {
-  const res = await fetch('/api/firebase-config');
-  const firebaseApp = initializeApp(await res.json());
-  console.log('Firebase działa:', firebaseApp.options.projectId);
+//const firebase = useFirebase();
+provideAuth();
+
+onMounted(() => {
+  //console.log(firebase.auth);
 });
+
 </script>
 
 <template>
   <div class="screen-wrapper">
-    <div class="screen-menu">  
-      <RouterView />
+    <div class="screen-menu"> 
+      <RouterView /> 
     </div>
     <div class="screen-background">
       <div class="skylight-container">

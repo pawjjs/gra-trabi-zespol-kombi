@@ -13,9 +13,8 @@ README.MD
 
 
 
- określenie wymagań funkcjonalnych (MVP),
-  podział zadań w zespole, 
-  identyfikacja głównych zasobów/encji i relacji między nimi, wstępny projekt API, 
+  identyfikacja głównych zasobów/encji i relacji między nimi,
+
    mapa nawigacji,
 
 

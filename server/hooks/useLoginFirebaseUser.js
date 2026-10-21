@@ -4,17 +4,18 @@ import { db,auth } from '../firebase.js';
 
 export const useLoginFirebaseUser = async (email,password) => 
 {
-    await signInWithEmailAndPassword(auth, email, password);
-    const UserRef = doc(db, 'Users', auth.currentUser.uid);
-    const UserSnap = await getDoc(UserRef);
-    if (UserSnap.exists()) 
-    {
-      await updateDoc(UserRef, {
-        online: true
-      })
-    }
-    else
-    {
-        throw `User snapshot doesn't exist`;
-    }
+  await signInWithEmailAndPassword(auth, email, password);
+  const UserRef = doc(db, 'Users', auth.currentUser.uid);
+  console.log('zalowowano na: ' + auth.currentUser.uid);
+  const UserSnap = await getDoc(UserRef);
+  if (UserSnap.exists()) 
+  {
+    await updateDoc(UserRef, {
+      online: true
+    })
+  }
+  else
+  {
+    throw `User snapshot doesn't exist`;
+  }
 };

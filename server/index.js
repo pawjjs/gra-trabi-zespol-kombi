@@ -2,7 +2,7 @@ import express, { request, response } from 'express';
 import { firebaseConfig }  from './firebase.js';
 import { getFirestore } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
-import { useAuth } from "./hooks/useAuth.js";
+
 import { useRegisterFirebaseUser } from './hooks/useRegisterFirebaseUser.js';
 import { useLoginFirebaseUser } from './hooks/useLoginFirebaseUser.js';
 
@@ -24,10 +24,7 @@ app.get('/api/firebase-config', (request, response) =>
 {
     response.json(firebaseConfig);
 });
-app.get('/api/firebase-auth', (request , response) => 
-{
-    response.json(useAuth());
-});
+
 
 app.post('/api/firebase/register', async (request, response) => 
 {

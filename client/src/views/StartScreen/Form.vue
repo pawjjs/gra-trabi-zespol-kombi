@@ -1,5 +1,6 @@
 <script setup>
 import { computed, reactive, ref, watch, onMounted , watchEffect} from 'vue';
+import { useRouter } from 'vue-router';
 import validator from 'validator';
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
@@ -15,6 +16,7 @@ const props = defineProps
 ({
   type: { type: String, default: 'L' },
 });
+const router = useRouter();
 const isRegister = computed(() => props.type === 'R');
 
 const nick = ref('');
@@ -38,7 +40,8 @@ const toastNotify = (textArgument) => {
   }); 
 }
 ////////////////////////
-const authXD = ref({
+
+/*const authXD = ref({
     user: null,
     loading: true
 });
@@ -61,8 +64,9 @@ const fetchAuth = async () => {
 };
 
 // Wykonaj po zamontowaniu komponentu
-onMounted(() => {
-    fetchAuth();
+onMounted(() => 
+{
+  fetchAuth();
 });
 
 // Reakcja na zmianę użytkownika
@@ -77,7 +81,7 @@ watch(
 // Automatycznie reaguje na użyte wewnątrz zależności
 watchEffect(() => {
     console.log('Stan użytkownika:', authXD.value.user);
-});
+});*/
 ////////////////////////
 
 
@@ -168,6 +172,7 @@ const handleSubmitLogin = async (e) => {
       throw data.message || response.statusText;
     }
     console.log("Login Success");
+    router.push('/home');
   } 
   catch (error) 
   {
