@@ -2,14 +2,13 @@
 import './style.css';
 import { useFirebase } from './store/firebase';
 import { onMounted } from 'vue';
-import { useAuth , provideAuth} from './hooks/useAuth.js';
 
 //const firebase = useFirebase();
-provideAuth();
+//provideAuth();
 
-onMounted(() => {
-  //console.log(firebase.auth);
-});
+//onMounted(async () => {
+//  console.log(firebase.user); 
+//});
 
 </script>
 

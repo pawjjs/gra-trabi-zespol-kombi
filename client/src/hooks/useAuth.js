@@ -1,4 +1,4 @@
-import { onAuthStateChanged , getAuth} from 'firebase/auth';
+import { onAuthStateChanged } from 'firebase/auth';
 import { inject , provide , ref, onUnmounted } from 'vue';
 import { useFirebase } from '../store/firebase';
 

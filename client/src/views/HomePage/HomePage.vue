@@ -1,20 +1,28 @@
 <script setup>
-import { useAuth , provideAuth} from '../../hooks/useAuth.js';
+//import { useAuth , provideAuth} from '../../hooks/useAuth.js';
 import { onMounted } from 'vue';
+import { useFirebase } from '../../store/firebase.js';
 
+//const jsonResponse = await useApiRequest('POST', '/siema', { x: 8 })
+//  .catch(() => { /* toast przy błędzie */ }) 
 
+const firebase = useFirebase();
+//provideAuth();
 
-const { user, loading } = useAuth();
-
-onMounted(() => {
-  useAuth();
+onMounted(async () => 
+{
+   // await firebase.login('ryangszdxcfdsfng@ether.lord','Qwesdfgvsad_77*');
+  console.log(firebase.user); 
 });
-
 </script>
 
 <template>
-    <div v-if="loading">Loading...</div>
+    <div v-if="!firebase.isAuthenticated">Loading...</div>
     <div v-else>
-        {{ user ? `Logged in as ${user}` : 'Not logged in' }}
+        {{ firebase.user ? `Logged in as ${firebase.user.email}` : 'Not logged in' }}
+        <hr/>
+        <button>
+            Logout
+        </button>
     </div>
 </template>

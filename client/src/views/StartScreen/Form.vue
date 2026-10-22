@@ -9,6 +9,7 @@ import { getAuth , createUserWithEmailAndPassword, signInWithEmailAndPassword  }
 import { getFirestore , getDoc, setDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { initializeApp } from "firebase/app";
 
+import { useFirebase } from '../../store/firebase.js';
 import InputField from './InputField.vue';
 import './form.css';
 
@@ -22,6 +23,9 @@ const isRegister = computed(() => props.type === 'R');
 const nick = ref('');
 const email = ref('');
 const password = ref('');
+
+const firebase = useFirebase();
+
 
 const errors = reactive({
   emailValid : '',
@@ -39,51 +43,6 @@ const toastNotify = (textArgument) => {
     transition: "slide"
   }); 
 }
-////////////////////////
-
-/*const authXD = ref({
-    user: null,
-    loading: true
-});
-
-const fetchAuth = async () => {
-    authXD.value.loading = true;
-    try 
-    {
-        const response = await fetch('/api/firebase-auth');
-        if (!response.ok) 
-        {
-            throw new Error(`HTTP error: ${response.status}`);
-        }
-        const data = await response.json();
-        authXD.value.user = data.user;
-        authXD.value.loading = false;
-    } catch (err) {
-        console.log(err);
-    }
-};
-
-// Wykonaj po zamontowaniu komponentu
-onMounted(() => 
-{
-  fetchAuth();
-});
-
-// Reakcja na zmianę użytkownika
-watch(
-    () => authXD.value.user,
-    (newUser, oldUser) => {
-        console.log('Poprzedni użytkownik:', oldUser);
-        console.log('Nowy użytkownik:', newUser);
-    }
-);
-
-// Automatycznie reaguje na użyte wewnątrz zależności
-watchEffect(() => {
-    console.log('Stan użytkownika:', authXD.value.user);
-});*/
-////////////////////////
-
 
 /*
 TODO: Implement file input handler
@@ -155,12 +114,26 @@ const handleSubmitRegister = async (e) =>{
 
 const handleSubmitLogin = async (e) => {
   e.preventDefault();
+  //const jsonResponse = await useApiRequest('POST', '/siema', { x: 8 })
+  //.catch(() => { /* toast przy błędzie */ }) 
   try 
   {
+    ////await firebase.login('ryangosling@ether.lord','QweasD_77*');
     const form = e.target;
     const formData = new FormData(form);
     const values = Object.fromEntries(formData.entries());
-    const response = await fetch('/api/firebase/login', 
+
+    const email = values.form_email;
+    const password = values.form_password;
+
+    console.log('uwu1'+firebase.user.uid);
+    await firebase.login(email ,password);
+    console.log('uwu2'+firebase.user.uid);
+
+    
+
+
+    /*const response = await fetch('/api/firebase/login', 
     {
       method: form.method.toUpperCase(),
       headers: { 'Content-Type': 'application/json' },
@@ -170,9 +143,9 @@ const handleSubmitLogin = async (e) => {
     if (!response.ok) 
     {
       throw data.message || response.statusText;
-    }
-    console.log("Login Success");
-    router.push('/home');
+    }*/
+    //console.log("Login Success");
+    //router.push('/home');
   } 
   catch (error) 
   {

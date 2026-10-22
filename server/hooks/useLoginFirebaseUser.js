@@ -1,9 +1,10 @@
-import { getAuth , createUserWithEmailAndPassword, signInWithEmailAndPassword  } from '@firebase/auth';
-import { getFirestore , getDoc, setDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { signInWithEmailAndPassword  } from '@firebase/auth';
+import { getDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db,auth } from '../firebase.js';
 
 export const useLoginFirebaseUser = async (email,password) => 
 {
+  return;
   await signInWithEmailAndPassword(auth, email, password);
   const UserRef = doc(db, 'Users', auth.currentUser.uid);
   console.log('zalowowano na: ' + auth.currentUser.uid);
@@ -18,4 +19,5 @@ export const useLoginFirebaseUser = async (email,password) =>
   {
     throw `User snapshot doesn't exist`;
   }
+  
 };
