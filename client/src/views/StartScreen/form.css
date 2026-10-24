@@ -1,0 +1,62 @@
+.auth {
+  max-width: 40vw;
+  margin: 0 auto;
+  padding: 1vw 1vw;
+  color: #222;
+}
+h2.form-label {
+  margin: 0 0 1vw;
+  font-size: 2vw;
+  text-align: center;
+  color: white;
+  text-shadow: 0.1vw 0.1vw rgb(95, 95, 0), 0.2vw 0.2vw 0.3vw #000000;
+}
+nav {
+  margin-top: 0.77vw;
+  text-align: center;
+  font-size: 1vw;
+}
+nav a {
+  color: rgb(0, 0, 0);
+  text-decoration: underline;
+  padding: 0.2vw;
+  transition: color 0.5s;
+}
+nav a:hover{
+  color: rgb(94, 116, 17);
+}
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+button {
+  margin-top: 0.2vw;
+  padding: 0.44vw;
+  font-size: 1vw;
+  font-weight: 700;
+  color: #000;
+  background: #ffeb00;
+  border: 0.2vw solid #000;
+  border-radius: 1vw;
+
+  cursor: pointer;
+}
+button:hover {
+  background: #fff35c;
+}
+::placeholder{
+  text-align: center; 
+}
+input {
+  padding: 0.251vw 1vw;
+  font-size: 0.88vw;
+  color: #111;
+  background: #fff;
+  border: 1px solid #bbb;
+  border-radius: 1vw;
+}
+input:focus {
+  outline: 0.1vw solid #ffeb00;
+  border-color: #111;
+}
