@@ -5,11 +5,8 @@ import validator from 'validator';
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 
-import { getAuth , createUserWithEmailAndPassword, signInWithEmailAndPassword  } from '@firebase/auth';
-import { getFirestore , getDoc, setDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { initializeApp } from "firebase/app";
-
-import { useFirebase } from '../../store/firebase.js';
+import { useApiRequest } from '../../hooks/useRequest.js';
+import { useFirebase  } from '../../store/firebase.js';
 import InputField from './InputField.vue';
 import './form.css';
 
@@ -61,7 +58,7 @@ const handleFileAvatar = (event) => {
     }
 }*/
 
-const handleSubmitRegister = async (e) =>{
+const handleSubmitRegister = async (e) => {
   e.preventDefault();
   try 
   {
@@ -91,7 +88,7 @@ const handleSubmitRegister = async (e) =>{
     const form = e.target;
     const formData = new FormData(form);
     const values = Object.fromEntries(formData.entries());
-    //TODO : Add avatar file from MongoDB
+    //TODO : Add avatar file from server assets
     const response = await fetch('/api/firebase/register', 
     {
       method: form.method.toUpperCase(),
@@ -114,38 +111,21 @@ const handleSubmitRegister = async (e) =>{
 
 const handleSubmitLogin = async (e) => {
   e.preventDefault();
-  //const jsonResponse = await useApiRequest('POST', '/siema', { x: 8 })
-  //.catch(() => { /* toast przy błędzie */ }) 
   try 
   {
-    ////await firebase.login('ryangosling@ether.lord','QweasD_77*');
     const form = e.target;
     const formData = new FormData(form);
     const values = Object.fromEntries(formData.entries());
 
     const email = values.form_email;
     const password = values.form_password;
-
-    console.log('uwu1'+firebase.user.uid);
     await firebase.login(email ,password);
-    console.log('uwu2'+firebase.user.uid);
 
+    //const jsonResponse = await useApiRequest('POST', '/api/firebase-auth', { x: 8 })
+    //.catch(() => { /* toast przy błędzie */ }) 
     
-
-
-    /*const response = await fetch('/api/firebase/login', 
-    {
-      method: form.method.toUpperCase(),
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(values), 
-    });
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok) 
-    {
-      throw data.message || response.statusText;
-    }*/
-    //console.log("Login Success");
-    //router.push('/home');
+    console.log("Login Success");
+    router.push('/home');
   } 
   catch (error) 
   {
@@ -237,7 +217,6 @@ const handleSubmitLogin = async (e) => {
         <button type="submit">Sign in</button>
       </form>
     </div>
-
     <nav>
       <RouterLink v-if="isRegister" to="/login">Log in</RouterLink>
       <RouterLink v-else to="/register">Create an account</RouterLink>

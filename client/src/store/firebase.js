@@ -2,7 +2,7 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { useAuth } from '@vueuse/firebase/useAuth'
 import { signInWithEmailAndPassword  } from '@firebase/auth';
-import { getFirestore } from "firebase/firestore";
+import { getFirestore , getDoc, doc, updateDoc } from "firebase/firestore";
 import { getAnalytics } from "firebase/analytics";
 import { defineStore } from "pinia";
 import { toast } from 'vue3-toastify';
@@ -15,6 +15,25 @@ import { toast } from 'vue3-toastify';
 
 export const useFirebase = defineStore('firebase', () => 
 {
+  /*state:() =>({
+    score:0,
+    health:100
+  });
+  
+  getters:{
+    getScore(){
+      return this.score
+    }
+  }
+
+  action:{
+    methodNameXD(){
+      this.score++;
+    }
+  
+  }
+  */
+
   const firebaseConfig = {
     apiKey: import.meta.env.VITE_API_KEY,
     authDomain: import.meta.env.VITE_AUTH_DOMAIN,
@@ -28,15 +47,14 @@ export const useFirebase = defineStore('firebase', () =>
   const auth = getAuth(firebaseApp);
   const db = getFirestore(firebaseApp);
 
-  const { isAuthenticated, user } = useAuth(auth);
+  const { isAuthenticated, user } = useAuth(auth);//Client side auth-Hook
 
   const login = async (email, password) => 
   {
     return signInWithEmailAndPassword(auth, email, password)
       .then(async () => 
       {
-        /*const UserRef = doc(db, 'Users', auth.currentUser.uid);
-        console.log('zalowowano na: ' + auth.currentUser.uid);
+        const UserRef = doc(db, 'Users', auth.currentUser.uid);
         const UserSnap = await getDoc(UserRef);
         if (UserSnap.exists()) 
         {
@@ -46,8 +64,8 @@ export const useFirebase = defineStore('firebase', () =>
         }
         else
         {
-          throw `User snapshot doesn't exist`;
-        }*/
+          throw `User snapshot doesn't exist`;  
+        }
         return true;
       })
       .catch((error) => 
@@ -63,28 +81,34 @@ export const useFirebase = defineStore('firebase', () =>
         return false;
       })
   }
+
+  const logout = async () => {
+    const UserRef = doc(db, "Users", auth.currentUser.uid);
+    const UserSnap = await getDoc(UserRef);
+    if (UserSnap.exists()) 
+    {
+      await updateDoc(UserRef, {
+        online: false
+      })
+    }
+    await auth.signOut();//NET::ERR_BLOCKED_BY_CLIENT
+  };
+
   //const register = async (...) => 
   //{
     // TODO: https://firebase.google.com/docs/auth/web/password-auth#create_a_password-based_account
   //}
-  return { firebaseConfig, firebaseApp, auth, db, login , isAuthenticated , user }
+  return { 
+    //<Objects>:
+    firebaseConfig, 
+    firebaseApp, 
+    auth, 
+    db, 
+    isAuthenticated, 
+    user,
+    
+    //<Functions>:
+    login,
+    logout 
+  }
 });
-
-
-
-/*export const firebaseConfig = {
-  apiKey: "AIzaSyDs_1rS1W2HmFKWT8GloPnETCuMGyjcRQM",
-  authDomain: "nierjs.firebaseapp.com",
-  projectId: "nierjs",
-  storageBucket: "nierjs.firebasestorage.app",
-  messagingSenderId: "712168672064",
-  appId: "1:712168672064:web:6b5c5bff864648b11dc8a5",
-  measurementId: "G-V86HYHMNCC"
-};
-
-// Initialize Firebase
-const firebaseApp = initializeApp(firebaseConfig);
-export const auth = getAuth(firebaseApp);
-export const db   = getFirestore(firebaseApp);
-
-export default firebaseApp;*/

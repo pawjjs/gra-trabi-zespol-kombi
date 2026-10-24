@@ -1,15 +1,5 @@
 <script setup>
 import './style.css';
-import { useFirebase } from './store/firebase';
-import { onMounted } from 'vue';
-
-//const firebase = useFirebase();
-//provideAuth();
-
-//onMounted(async () => {
-//  console.log(firebase.user); 
-//});
-
 </script>
 
 <template>

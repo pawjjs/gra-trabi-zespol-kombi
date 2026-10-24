@@ -20,7 +20,6 @@ export const firebaseConfig = {
   measurementId: process.env.MEASUREMENT_ID,
 };
 
-
 // Initialize Firebase
 const firebaseApp = initializeApp(firebaseConfig);
 export const auth = getAuth(firebaseApp);

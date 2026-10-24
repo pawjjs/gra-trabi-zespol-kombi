@@ -1,6 +1,7 @@
-import { getAuth , createUserWithEmailAndPassword, signInWithEmailAndPassword  } from '@firebase/auth';
-import { getFirestore , getDoc, setDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { db , auth} from '../firebase.js';
+import { createUserWithEmailAndPassword } from '@firebase/auth';
+import { setDoc, doc, serverTimestamp } from 'firebase/firestore';
+
+import { db, auth} from '../firebase.js';
 
 export const useRegisterFirebaseUser = async (name,email,password) => 
 {
