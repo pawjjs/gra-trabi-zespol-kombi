@@ -1,26 +1,28 @@
 import * as THREE from 'three';
 
-// ===================== USTAWIENIA =====================
 const HALF = 0.5;          // połowa rozmiaru klocka
-const MOVE_SPEED = 7;      // maksymalna prędkość pozioma
+const MOVE_SPEED = 10;      // maksymalna prędkość pozioma
 const ACCEL = 40;          // przyspieszenie
-const JUMP_SPEED = 9;      // prędkość początkowa skoku
+const JUMP_SPEED = 19;      // prędkość początkowa skoku
 const GRAVITY = 25;        // grawitacja
 const KILL_Y = -25;        // poniżej tej wysokości klocek "spadł"
 const EPS = 1e-4;
 const GAME_KEYS = ['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
 
-export class Game {
-  /**
-   * @param {HTMLElement} container  element, do którego trafi canvas
-   * @param {{playerColor?: string, onFall?: (falls:number)=>void, onRespawn?: ()=>void}} callbacks
-   */
-  constructor(container, { playerColor = '#ff4d6d', onFall = () => {}, onRespawn = () => {} } = {}) {
-    this.container = container;
+export class Game 
+{
+  constructor(container, 
+    { 
+      playerColor = '#ff4d6d', 
+      onFall = () => {}, 
+      onRespawn = () => {} 
+    } = {}) 
+  {
     this.playerColor = playerColor;
+    this.container = container;
     this.onFall = onFall;
     this.onRespawn = onRespawn;
-
+    
     this.spawn = new THREE.Vector3(0, 2, 0);
     this.pos = this.spawn.clone();
     this.vel = new THREE.Vector3();
@@ -40,9 +42,22 @@ export class Game {
     this._bindEvents();
     this._resize();
   }
+  
+  start() 
+  {
+    if (this.running) 
+    {
+      return;
+    }  
+    this.running = true;
+    this.lastTime = performance.now();
+    this.rafId = requestAnimationFrame(this._frame);
+  }
+
 
   // ---------- inicjalizacja ----------
-  _initScene() {
+  _initScene() 
+  {
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x0b1020);
     this.scene.fog = new THREE.Fog(0x0b1020, 25, 70);
@@ -65,21 +80,6 @@ export class Game {
     this.scene.add(this.sun.target);
   }
 
-  _addSolid(w, h, d, x, y, z, color) {
-    const mesh = new THREE.Mesh(
-      new THREE.BoxGeometry(w, h, d),
-      new THREE.MeshStandardMaterial({ color, roughness: 0.8 })
-    );
-    mesh.position.set(x, y, z);
-    mesh.castShadow = true;
-    mesh.receiveShadow = true;
-    this.scene.add(mesh);
-    this.solids.push({
-      min: new THREE.Vector3(x - w / 2, y - h / 2, z - d / 2),
-      max: new THREE.Vector3(x + w / 2, y + h / 2, z + d / 2),
-    });
-  }
-
   _buildWorld() {
     this._addSolid(24, 1, 24, 0, -0.5, 0, 0x3a7d44);     // główna plansza (góra y = 0)
     this._addSolid(3, 1, 3, 5, 0.5, -4, 0xc8553d);       // niski klocek
@@ -95,9 +95,27 @@ export class Game {
     this.scene.add(grid);
   }
 
+  _addSolid(w, h, d, x, y, z, color) 
+  {
+    const mesh = new THREE.Mesh(
+      new THREE.BoxGeometry(w, h, d),
+      new THREE.MeshStandardMaterial({ color, roughness: 0.8 })
+    );
+    mesh.position.set(x, y, z);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    this.scene.add(mesh);
+    this.solids.push({
+      min: new THREE.Vector3(x - w / 2, y - h / 2, z - d / 2),
+      max: new THREE.Vector3(x + w / 2, y + h / 2, z + d / 2),
+    });
+  }
+
+  
+
   _initPlayer() {
     this.player = new THREE.Mesh(
-      new THREE.BoxGeometry(HALF * 2, HALF * 2, HALF * 2),
+      new THREE.BoxGeometry(HALF , HALF , HALF ),
       new THREE.MeshStandardMaterial({ color: new THREE.Color(this.playerColor), roughness: 0.4 })
     );
     this.player.castShadow = true;
@@ -201,7 +219,8 @@ export class Game {
   }
 
   _frame = (now) => {
-    if (!this.running) return;
+    if (!this.running) 
+      return;
     this.rafId = requestAnimationFrame(this._frame);
 
     const dt = Math.min((now - this.lastTime) / 1000, 1 / 30);
@@ -221,15 +240,10 @@ export class Game {
     this.renderer.render(this.scene, camera);
   };
 
-  start() {
-    if (this.running) return;
-    this.running = true;
-    this.lastTime = performance.now();
-    this.rafId = requestAnimationFrame(this._frame);
-  }
-
-  // Sprzątanie – wywołaj przy opuszczeniu widoku (onBeforeUnmount)
-  destroy() {
+  
+  
+  destroy() 
+  {
     this.running = false;
     cancelAnimationFrame(this.rafId);
     clearTimeout(this.respawnTimer);
