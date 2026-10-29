@@ -17,25 +17,18 @@ const handleLogOut = async () => {
     }
 };
 
-
+//if not auth -> get back to '/'
 watchEffect(async () => {
-    //if(!firebase.isAuthenticated)
-    //{
-    //    router.push('/login');
-    //}
-    //const jsonResponse = await useApiRequest('POST', '/api/firebase-auth', { x: 8 })
-    //.catch(() => { /* toast przy błędzie */ }) 
-    //console.log(jsonResponse);
+    if(!firebase.isAuthenticated)
+    {
+        router.push('/login');
+    }
 })
 
-onMounted(async () => {
-    //if(!firebase.isAuthenticated)
-    //{
-    //    router.push('/login');
-    //}
 
-    const jsonResponse = await useApiRequest('POST', '/api/firebase-auth', { x: 8 })
-    .catch(() => { /* toast przy błędzie */ }) 
+onMounted(async () => {
+    const jsonResponse = await useApiRequest('POST', '/api/firebase-claim-token', { x: 8 })
+    .catch((er) => { console.log(er); }) 
     console.log(jsonResponse);
 });
 </script>

@@ -6,7 +6,7 @@ import { getFirestore , getDoc, doc, updateDoc } from "firebase/firestore";
 import { getAnalytics } from "firebase/analytics";
 import { defineStore } from "pinia";
 import { toast } from 'vue3-toastify';
-
+import { ref } from "vue";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -48,6 +48,13 @@ export const useFirebase = defineStore('firebase', () =>
   const db = getFirestore(firebaseApp);
 
   const { isAuthenticated, user } = useAuth(auth);//Client side auth-Hook
+
+  const isAuthReady = ref(false);
+  auth.authStateReady()
+  .then(() => {
+    isAuthReady.value = true;
+  })
+
 
   const login = async (email, password) => 
   {
@@ -91,13 +98,9 @@ export const useFirebase = defineStore('firebase', () =>
         online: false
       })
     }
-    await auth.signOut();//NET::ERR_BLOCKED_BY_CLIENT
+    await auth.signOut();//NET::ERR_BLOCKED_BY_CLIENT wyłącz Brave tarcze
   };
 
-  //const register = async (...) => 
-  //{
-    // TODO: https://firebase.google.com/docs/auth/web/password-auth#create_a_password-based_account
-  //}
   return { 
     //<Objects>:
     firebaseConfig, 
@@ -106,6 +109,7 @@ export const useFirebase = defineStore('firebase', () =>
     db, 
     isAuthenticated, 
     user,
+    isAuthReady,
     
     //<Functions>:
     login,

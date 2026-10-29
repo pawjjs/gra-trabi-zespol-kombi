@@ -30,6 +30,8 @@ const errors = reactive({
   //TODO: make file validation
 });
 
+
+
 const toastNotify = (textArgument) => {
   toast(textArgument,
   {
@@ -116,13 +118,13 @@ const handleSubmitLogin = async (e) => {
     const form = e.target;
     const formData = new FormData(form);
     const values = Object.fromEntries(formData.entries());
-
     const email = values.form_email;
     const password = values.form_password;
+
     await firebase.login(email ,password);
 
-    //const jsonResponse = await useApiRequest('POST', '/api/firebase-auth', { x: 8 })
-    //.catch(() => { /* toast przy błędzie */ }) 
+    const jsonResponse = await useApiRequest('POST', '/api/firebase-claim-token', { x: 8 })
+    .catch((err) => { throw err }) 
     
     console.log("Login Success");
     router.push('/home');
@@ -132,7 +134,6 @@ const handleSubmitLogin = async (e) => {
     toastNotify(error);
   }
 }
-
 </script>
 
 <template>
@@ -160,8 +161,7 @@ const handleSubmitLogin = async (e) => {
           />
         </template>
       </InputField>
-      <!--
-      <InputField>
+      <!--<InputField>
         *** Image File Handle ***
 
         React version
@@ -175,8 +175,7 @@ const handleSubmitLogin = async (e) => {
                   />
                 }
               />
-      </InputField>
-      -->
+      </InputField>-->
       <InputField label-name="Password" :error="errors.isPasswordStrong">
         <template #body>
           <input 

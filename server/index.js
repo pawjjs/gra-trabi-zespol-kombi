@@ -18,9 +18,9 @@ app.get('/api/firebase-config', (request, response) =>
     response.json(firebaseConfig);
 });
 
-//Server side auth-Hook
+//Server side - claimtoken
 //app.post('/siema')
-app.post('/api/firebase-auth', async (request, response) => 
+app.post('/api/firebase-claim-token', async (request, response) => 
 {
   if (!request.headers.authorization?.startsWith('Bearer ')) 
   {

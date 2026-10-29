@@ -2,38 +2,49 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { Game } from '../game/Game.js';
 
-const container = ref(null);
-const falls = ref(0);
+const container   = ref(null);
+const falls       = ref(0);
 const showFallMsg = ref(false);
-const message = ref('Spadłeś!');
+const message     = ref('Spadłeś!');
+
 let game = null;
 let unmounted = false;
 
-onMounted(async () => {
-  // Domyślne wartości na wypadek, gdyby API nie odpowiedziało
+onMounted(async () => 
+{
   let playerColor = '#ff4d6d';
-
-  try {
+  try 
+  {
     const res = await fetch('/api/game');
     const data = await res.json();
     message.value = data.message;
     playerColor = data.playerColor;
-  } catch (err) {
+  } 
+  catch (err) 
+  {
     console.error('Nie udało się pobrać /api/game:', err);
   }
-
-  // Użytkownik mógł opuścić widok w trakcie czekania na API
-  if (unmounted) return;
-
+  if (unmounted) 
+  {
+    return;
+  }
   game = new Game(container.value, {
     playerColor,
-    onFall: (n) => { falls.value = n; showFallMsg.value = true; },
-    onRespawn: () => { showFallMsg.value = false; },
+    onFall: (n) => 
+    { 
+      falls.value = n; 
+      showFallMsg.value = true; 
+    },
+    onRespawn: () => 
+    {
+      showFallMsg.value = false; 
+    },
   });
   game.start();
 });
 
-onBeforeUnmount(() => {
+onBeforeUnmount(() => 
+{
   unmounted = true;
   game?.destroy();
 });
@@ -42,12 +53,8 @@ onBeforeUnmount(() => {
 <template>
   <div class="game-wrap">
     <div ref="container" class="game-canvas"></div>
-
     <div class="hud">
-      <b>Sterowanie</b><br />
-      WASD / strzałki – ruch<br />
-      Spacja – skok<br />
-      R – wróć na start<br />
+      R - wróć na start<br />
       Upadki: {{ falls }}
     </div>
 
@@ -59,7 +66,7 @@ onBeforeUnmount(() => {
 .game-wrap {
   position: relative;
   flex: 1;
-  min-height: 480px;
+  min-height: 780px;
   background: #0b1020;
   overflow: hidden;
 }
@@ -80,7 +87,7 @@ onBeforeUnmount(() => {
   font-size: 14px;
   line-height: 1.5;
   text-align: left;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(105, 0, 0, 0.45);
   padding: 10px 14px;
   border-radius: 8px;
   pointer-events: none;

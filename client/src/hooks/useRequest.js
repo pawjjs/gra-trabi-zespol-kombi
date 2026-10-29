@@ -1,5 +1,6 @@
 import { storeToRefs } from "pinia";
 import { useFirebase } from "../store/firebase.js";
+import {until} from '@vueuse/core';
 
 export const BASE_URL = 'http://localhost:'+import.meta.env.VITE_NODE_PORT || 'http://localhost:3000'
 
@@ -10,10 +11,10 @@ export const useApiRequest = async (method, path, data) =>
    *Access to fetch at 'http://localhost:3000/api/siema' from origin 'http://localhost:5173' has been blocked by CORS policy: 
    *Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.
    */
-  const { user } = storeToRefs(useFirebase());
-  console.log(user.value); //na zajęciach odkomentuj i zakomentyuj
+  const store = useFirebase();
+  const { user,isAuthReady } = storeToRefs(store);
+  await until(isAuthReady).toBe(true);
 
-  //return fetch(url, 
   return fetch(path, 
   {
     method,
