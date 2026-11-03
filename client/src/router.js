@@ -5,6 +5,7 @@ import Form        from './views/StartScreen/Form.vue';
 import GameView    from './views/GameView.vue';
 import HomePage    from './views/HomePage/HomePage.vue';
 import Test from './views/Test.vue';
+import Nexus from './views/Nexus/Nexus.vue';
 
 export default createRouter({
   history: createWebHistory(),
@@ -16,7 +17,8 @@ export default createRouter({
         { path: '', redirect: '/login' },//?
         { path: 'login', component: Form, props: { type: 'L' } },
         { path: 'register', component: Form, props: { type: 'R' } },
-        { path: 'home', component: HomePage }
+        { path: 'home', component: HomePage },
+        { path: 'nexus', component: Nexus}
       ],
     },
 
