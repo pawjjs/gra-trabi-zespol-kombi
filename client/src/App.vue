@@ -7,6 +7,7 @@ import firebaseLoader from './firebaseLoader.vue';
   <Suspense>
     <firebaseLoader />
     <template #fallback>
+      <!--Loading-->
     <div class="screen-wrapper">
       <div class="screen-menu"> 
       </div>

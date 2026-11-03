@@ -46,49 +46,28 @@ export const useFirebase = defineStore('firebase', () =>
   const firebaseApp = initializeApp(firebaseConfig);
   const auth = getAuth(firebaseApp);
   const db = getFirestore(firebaseApp);
-
   const { isAuthenticated, user } = useAuth(auth);//Client side auth-Hook
-
   const isAuthReady = ref(false);
-  auth.authStateReady()
-  .then(() => {
-    isAuthReady.value = true;
-  })
-
-
-  const login = async (email, password) => 
-  {
+  
+  const login = async (email, password) => {
     return signInWithEmailAndPassword(auth, email, password)
-      .then(async () => 
-      {
+      .then(async () => {
         const UserRef = doc(db, 'Users', auth.currentUser.uid);
         const UserSnap = await getDoc(UserRef);
-        if (UserSnap.exists()) 
-        {
+        if (UserSnap.exists()) {
           await updateDoc(UserRef, {
             online: true
           })
         }
-        else
-        {
+        else{
           throw `User snapshot doesn't exist`;  
         }
         return true;
       })
-      .catch((error) => 
-      {
-        toast(error.message,
-        {
-          autoClose: 1500,
-          type: 'warning',
-          theme: "dark",
-          position: "bottom-center", 
-          transition: "slide"
-        }); 
-        return false;
+      .catch((error) => {
+        throw new Error(error);
       })
   }
-
   const logout = async () => {
     const UserRef = doc(db, "Users", auth.currentUser.uid);
     const UserSnap = await getDoc(UserRef);
@@ -98,8 +77,13 @@ export const useFirebase = defineStore('firebase', () =>
         online: false
       })
     }
-    await auth.signOut();//NET::ERR_BLOCKED_BY_CLIENT wyłącz Brave tarcze
+    await auth.signOut();//NET::ERR_BLOCKED_BY_CLIENT turn off Brave Shield
   };
+
+  auth.authStateReady()
+  .then(() => {
+    isAuthReady.value = true;
+  })
 
   return { 
     //<Objects>:

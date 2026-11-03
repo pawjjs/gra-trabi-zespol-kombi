@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, shallowRef } from 'vue'
 import { useLoop } from '@tresjs/core'
-import * as THREE from 'three'
+import * as THREE from 'three';
 import Model from './Model.vue'
 
 const props = withDefaults(
@@ -112,6 +112,7 @@ onBeforeRender(({ delta }) => {
   lookTarget.set(p.position.x, CAM_LOOK_HEIGHT + p.position.y * 0.5, p.position.z)
   cam.lookAt(lookTarget)
 })
+
 </script>
 
 <template>

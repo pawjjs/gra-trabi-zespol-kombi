@@ -14,23 +14,27 @@ const props = defineProps
 ({
   type: { type: String, default: 'L' },
 });
-const router = useRouter();
-const isRegister = computed(() => props.type === 'R');
 
+const isRegister = computed(() => props.type === 'R');
 const nick = ref('');
 const email = ref('');
 const password = ref('');
 
+const router = useRouter();
 const firebase = useFirebase();
 
+watchEffect(async () => {
+  if(firebase.isAuthenticated)
+  {
+    router.push('/home');
+  }
+})
 
 const errors = reactive({
   emailValid : '',
   isPasswordStrong: ''
   //TODO: make file validation
 });
-
-
 
 const toastNotify = (textArgument) => {
   toast(textArgument,
@@ -102,7 +106,11 @@ const handleSubmitRegister = async (e) => {
     {
       throw data.message || response.statusText;
     }
-    console.log("Register Success");
+    toastNotify("Register Success");
+    await firebase.login(email.value ,password.value);
+    const jsonResponse = await useApiRequest('POST', '/api/firebase-claim-token', { x: 8 })
+    .catch((err) => { throw err }) 
+    router.push('/home');
   } 
   catch (error) 
   {

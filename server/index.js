@@ -8,18 +8,16 @@ import { useRegisterFirebaseUser } from './hooks/useRegisterFirebaseUser.js';
 const app = express();
 
 // <Middleware>:
-app.use(express.json());//Ability thats gives POST data as JSON's
-//Parsing request body in JSON format:
+app.use(express.json());//Ability thats gives POST data as JSON's. Parsing request body in JSON format:
 
 
 // <EndPoints>:
 app.get('/api/firebase-config', (request, response) => 
 {
-    response.json(firebaseConfig);
+  response.json(firebaseConfig);
 });
 
 //Server side - claimtoken
-//app.post('/siema')
 app.post('/api/firebase-claim-token', async (request, response) => 
 {
   if (!request.headers.authorization?.startsWith('Bearer ')) 
@@ -38,7 +36,6 @@ app.post('/api/firebase-claim-token', async (request, response) =>
     response.status(401).json({ error: "Invalid Token in header" })
     return
   }
-  console.log('ez');
   response.json({ email: user.email })
 })
 
@@ -62,32 +59,15 @@ app.post('/api/firebase/register', async (request, response) =>
 
 
 
-
-
-
-
-
-
-
-app.get('/api/hello', (req, res) => 
-{
-    res.json({ message: 'Siema siema' });
-});
-app.get('/api/goodbye', (req, res) => 
-{
-    res.json({ message: 'Goodbye World' })
-});
-
-const PLAYER_COLOR = '#1dfa00';
-app.get('/api/game', (req, res) => 
-{
-    res.json({ message: 'Spadłeś', playerColor: PLAYER_COLOR });
+app.use((req, res, next) => {
+  console.log("Not Found : 404")
+  res.status(404);
 });
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 app.listen(process.env.NODE_PORT, () => console.log('API: http://localhost:'+process.env.NODE_PORT));
 
 
-// <Notes/Garbages>:
+// <Notes/OtherStuff>:
 
 /**
 import { initializeApp } from 'firebase-admin/app'
