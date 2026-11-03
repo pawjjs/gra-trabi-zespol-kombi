@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { useAuth } from '@vueuse/firebase/useAuth'
-import { signInWithEmailAndPassword  } from '@firebase/auth';
+import { signInWithEmailAndPassword  } from 'firebase/auth';
 import { getFirestore , getDoc, doc, updateDoc } from "firebase/firestore";
 import { getAnalytics } from "firebase/analytics";
 import { defineStore } from "pinia";
