@@ -1,9 +1,7 @@
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { useAuth } from '@vueuse/firebase/useAuth'
-import { signInWithEmailAndPassword  } from 'firebase/auth';
 import { getFirestore , getDoc, doc, updateDoc } from "firebase/firestore";
-import { getAnalytics } from "firebase/analytics";
 import { defineStore } from "pinia";
 import { toast } from 'vue3-toastify';
 import { ref } from "vue";
@@ -98,7 +96,7 @@ export const useFirebase = defineStore('firebase', () =>
         online: false
       })
     }
-    await auth.signOut();//NET::ERR_BLOCKED_BY_CLIENT wyłącz Brave tarcze
+    await auth.signOut();//NET::ERR_BLOCKED_BY_CLIENT wyłącz Brave tarcze (albo zainstaluj firefox jak prawdziwy gigachad)
   };
 
   return { 
