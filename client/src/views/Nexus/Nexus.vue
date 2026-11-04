@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue';
-import { collection, onSnapshot, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, onSnapshot, doc, updateDoc, serverTimestamp, query, orderBy } from 'firebase/firestore';
 import { useFirebase } from '../../store/firebase.js';
 import PlayerBlock from './PlayerBlock.vue';
 import './Nexus.css';
@@ -24,8 +24,9 @@ const startClockTicker = () => {
 // Real-time listener for Users collection in Firestore
 const listenToUsersChanges = () => {
   const usersRef = collection(firebase.db, 'Users');
+  const usersQuery = query(usersRef, orderBy('ping', 'desc'));
   const unsubscribe = onSnapshot(
-    usersRef,
+    usersQuery,
     (snapshot) => {
       const table = snapshot.docs.map((docSnap) => ({
         uid: docSnap.id,
