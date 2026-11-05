@@ -25,4 +25,11 @@ const firebaseApp = initializeApp(firebaseConfig);
 export const auth = getAuth(firebaseApp);
 export const db   = getFirestore(firebaseApp);
 
+/*async function updateUserAvatar(userId, avatarFilename) {
+  const userRef = doc(db, 'users', userId);
+  await updateDoc(userRef, {
+    avatar: avatarFilename
+  });
+}*/
+
 export default firebaseApp;

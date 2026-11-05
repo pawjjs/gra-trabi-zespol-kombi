@@ -5,6 +5,7 @@ import Form        from './views/StartScreen/Form.vue';
 import GameView    from './views/GameView.vue';
 import HomePage    from './views/HomePage/HomePage.vue';
 import Test from './views/Test.vue';
+import AvatarTest from './views/AvatarTest.vue';
 
 export default createRouter({
   history: createWebHistory(),
@@ -22,6 +23,7 @@ export default createRouter({
 
     { path: '/game', component: GameView },
     { path: '/test', component: Test},
+    { path: '/test-avatar', component: AvatarTest },
 
     { path: '/:pathMatch(.*)*', redirect: '/' },
   ],

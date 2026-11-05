@@ -1,14 +1,22 @@
 import express from 'express';
+import path from 'path';
+import cors from 'cors';
+import { fileURLToPath } from 'url';
 import { initializeApp } from "firebase-admin/app";
 import { getAuth } from 'firebase-admin/auth';
 
 import { firebaseConfig }  from './firebase.js';
 import { useRegisterFirebaseUser } from './hooks/useRegisterFirebaseUser.js';
+import upload from './upload.js'
 
 const app = express();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // <Middleware>:
-app.use(express.json());//Ability thats gives POST data as JSON's
+app.use(express.json()); //Ability thats gives POST data as JSON's
+app.use(cors());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 //Parsing request body in JSON format:
 
 
@@ -83,6 +91,23 @@ app.get('/api/game', (req, res) =>
 {
     res.json({ message: 'Spadłeś', playerColor: PLAYER_COLOR });
 });
+
+app.post('/api/upload', upload.single('avatar'), (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'Nie przesłano żadnego pliku.' });
+    }
+
+    res.status(200).json({
+      message: 'Plik zapisany pomyślnie',
+      filename: req.file.filename,
+      url: `/uploads/${req.file.filename}`
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 app.listen(process.env.NODE_PORT, () => console.log('API: http://localhost:'+process.env.NODE_PORT));
 
