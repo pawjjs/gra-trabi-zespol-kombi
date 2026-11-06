@@ -5,47 +5,42 @@ import { useLoop } from '@tresjs/core'
 import * as THREE from 'three';
 import Model from './Model.vue'
 import { OrbitControls } from '@tresjs/cientos';
+import {useMouse} from '@vueuse/core';
 
 const props = defineProps({
   path: {type: String},
   scale: {type: Number, default: 1},
   modelYaw: {type:Number, default: Math.PI},
-  /**
-  *              Math.PI
+  /**            Math.PI
   * 
-  *-Math.PI/2              Math.PI/2
+  *-Math.PI/2      X       Math.PI/2
   * 
-  *                0
-  */
+  *                0                 */
  hover: {type: Number, default: 1},
  limit: {type: Number, default: 24}//limit area
 });
 
 const keys = {};// Array which keys are pressed <boolean>
-const mousePosition = reactive({
-  x: 0,
-  y: 0
-});
+const { x, y, sourceType } = useMouse({ type: 'movement' });
 
 const playerRef = shallowRef();
 const cameraRef = shallowRef();
 let cameraReady = false;
 const FOV = 45;//CoD wanna be :P
 
-
 const MOVE_SPEED = 2.1;
 const SPRINT_MULT = 4.8;
 const TURN_SPEED = 3.6;
 
 const JUMP_SPEED = 7
-const GRAVITY = 20
-let velocityY = 0
-let grounded = true
+const GRAVITY = 20;
+let velocityY = 0;
+let grounded = true;
 
 let CAM_DISTANCE = 3.5;
-const CAM_HEIGHT = 2
-const CAM_LOOK_HEIGHT = 1.5
-const CAM_SMOOTH = 100
+const CAM_HEIGHT = 2;
+const CAM_LOOK_HEIGHT = 1.5;
+const CAM_SMOOTH = 100;
 
 const desired = new THREE.Vector3()
 const lookTarget = new THREE.Vector3()
@@ -70,15 +65,8 @@ const releaseAll = () => {
     keys[k] = false;
   }
 }
-//mouse move
-const onMouseMove = (e) => {
-  //e.target.requestPointerLock();
-  mousePosition.x = e.clientX;
-  mousePosition.y = e.clientY;
-};
 // klikanie myszą
 const onMouseClick = (e) => {
-  //console.log(e);
   if(e.button === 1){
     console.log("Srodkowy")
   }
@@ -89,20 +77,21 @@ const onMouseClick = (e) => {
     console.log("prawy")
   }
 };
-
+// scrolling - close up/down
 const scroll = (e) => {
-  console.log(e);
   if(e.deltaY < 0 && CAM_DISTANCE>1.3){
     CAM_DISTANCE -= 0.1;
+    CAM_HEIGHT += 0.1;
   }
   if(e.deltaY > 0 && CAM_DISTANCE<7){
     CAM_DISTANCE += 0.1;
+    CAM_HEIGHT -= 0.2;
   }
 }
 
 onMounted(() => {
+
   window.addEventListener('wheel',scroll);
-  //window.addEventListener('mousemove',onMouseMove);
   window.addEventListener('mousedown',onMouseClick);
   window.addEventListener('keydown', onKeyDown);
   window.addEventListener('keyup', onKeyUp);
@@ -138,13 +127,27 @@ onBeforeRender(({ delta,elapsed }) => {
 
 
 
+  // granice podłogi
+  player.position.x = THREE.MathUtils.clamp(player.position.x, -props.limit, props.limit)
+  player.position.z = THREE.MathUtils.clamp(player.position.z, -props.limit, props.limit)
 
 
 
-  // obrót: Q / E lub strzałki
 
-  const turn = (keys.KeyQ ? 1 : 0) - (keys.KeyE   ? 1 : 0);
-  player.rotation.y += turn * TURN_SPEED * dt;
+
+
+  // skok + grawitacja
+  if (keys.Space && grounded) {
+    velocityY = JUMP_SPEED
+    grounded = false
+  }
+  velocityY -= GRAVITY * dt
+  player.position.y += velocityY * dt
+  if (player.position.y <= 0) {
+    player.position.y = 0
+    velocityY = 0
+    grounded = true
+  }
 
 
 
@@ -165,59 +168,27 @@ onBeforeRender(({ delta,elapsed }) => {
   }
   lookTarget.set(player.position.x, CAM_LOOK_HEIGHT + player.position.y * 0.5, player.position.z)
   camera.lookAt(lookTarget)
-  return;
-  
-
-  
-  
-
-  // granice podłogi
-  p.position.x = THREE.MathUtils.clamp(p.position.x, -props.limit, props.limit)
-  p.position.z = THREE.MathUtils.clamp(p.position.z, -props.limit, props.limit)
-
-  // skok + grawitacja
-  if (keys.Space && grounded) {
-    velocityY = JUMP_SPEED
-    grounded = false
-  }
-  velocityY -= GRAVITY * dt
-  p.position.y += velocityY * dt
-  if (p.position.y <= 0) {
-    p.position.y = 0
-    velocityY = 0
-    grounded = true
-  }
 })
 
-watch(() => [mousePosition.x, mousePosition.y],
+
+watch([x, y],
   ([newX, newY], [oldX, oldY]) => {
     const player = playerRef.value;
     console.log('Nowa pozycja:', newX, newY);
     console.log('Poprzednia pozycja:', oldX, oldY);
-    let move = 0;
-    if(newX > oldX)
-    {
-      move = 1;
-    }
-    else
-    {
-      move = -1;
-    }
-    if(props.hover)
-    {
-      //player.rotation.y += move * TURN_SPEED * 0.005;
-    }    
+
+    player.rotation.y += -newX * TURN_SPEED * 0.0005;
+    
+    
   }
 )
 
-//clear up
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', onKeyDown);
   window.removeEventListener('keyup', onKeyUp);
   window.removeEventListener('blur', releaseAll);
-  window.removeEventListener('mousedown',onMouseClick);
   window.removeEventListener('wheel',scroll);
-  //window.removeEventListener('mousemove',onMouseMove);
+  window.removeEventListener('mousedown',onMouseClick);
 })
 </script>
 
