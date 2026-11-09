@@ -3,7 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import StartScreen from './views/StartScreen/StartScreen.vue';
 import Form        from './views/StartScreen/Form.vue';
 import HomePage    from './views/HomePage/HomePage.vue';
-import Test        from './views/Test.vue';
+import Test from './views/Test.vue';
 
 export default createRouter({
   history: createWebHistory(),

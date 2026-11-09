@@ -18,6 +18,7 @@ export const useRegisterFirebaseUser = async (name,email,password) =>
       {
         email: user.email,
         playerNick: name,
+        // TODO: AVATAR
         //avatar: file_id,
         online: true,
         assigned: '',

@@ -1,9 +1,7 @@
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { useAuth } from '@vueuse/firebase/useAuth'
-import { signInWithEmailAndPassword  } from '@firebase/auth';
 import { getFirestore , getDoc, doc, updateDoc } from "firebase/firestore";
-import { getAnalytics } from "firebase/analytics";
 import { defineStore } from "pinia";
 import { toast } from 'vue3-toastify';
 import { ref } from "vue";
@@ -33,7 +31,6 @@ export const useFirebase = defineStore('firebase', () =>
   
   }
   */
-
   const firebaseConfig = {
     apiKey: import.meta.env.VITE_API_KEY,
     authDomain: import.meta.env.VITE_AUTH_DOMAIN,
@@ -80,6 +77,16 @@ export const useFirebase = defineStore('firebase', () =>
     await auth.signOut();//NET::ERR_BLOCKED_BY_CLIENT turn off Brave Shield
   };
 
+  /*const fetchUserData = async () =>{
+    const docRef = doc(firebase.db, "Users", user.value.uid);
+    const docSnap = await getDoc(docRef);
+    if(docSnap.exists())
+    {
+      return docSnap.data();
+    }
+    return "User Document Snap doesnt exist";
+  };*/
+
   auth.authStateReady()
   .then(() => {
     isAuthReady.value = true;
@@ -97,6 +104,7 @@ export const useFirebase = defineStore('firebase', () =>
     
     //<Functions>:
     login,
-    logout 
+    logout,
+    //fetchUserData
   }
 });

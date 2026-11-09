@@ -88,7 +88,7 @@ const scroll = (e) => {
   }
   if(e.deltaY > 0 && CAM_DISTANCE<7){
     CAM_DISTANCE += 0.1;
-    CAM_HEIGHT -= 0.2;
+    CAM_HEIGHT -= 0.1;
   }
 }
 
@@ -111,28 +111,66 @@ onBeforeRender(({ delta,elapsed }) => {
   }
   const dt = Math.min(delta, 0.05);
   const speed = MOVE_SPEED * (keys.ShiftLeft ? SPRINT_MULT : 1);
+
+
   let inputZ = (keys.KeyW ? 1 : 0) - (keys.KeyS ? 1 : 0); // +1 forward; -1 backward
   let inputX = (keys.KeyA ? 1 : 0) - (keys.KeyD ? 1 : 0); // +1 left;    -1 right
   const hypotenuse = Math.hypot(inputX, inputZ);// AND = 1.41 , NAND = 1
 
-
-  
-  if(inputZ != 0 || inputX != 0){
-    player.rotation.y = CameraRotationX.value + Math.PI/2;
+  if(inputZ != 0 || inputX != 0)
+  {
+    if(inputZ==1 && inputX==0)
+    {
+      //up
+      player.rotation.y = CameraRotationX.value + Math.PI*0.5;
+    }
+    if(inputZ==-1 && inputX==0)
+    {
+      //down
+      player.rotation.y = CameraRotationX.value - Math.PI*0.5;
+    }
+    if(inputZ==0 && inputX==1)
+    {
+      //left
+      player.rotation.y = CameraRotationX.value + Math.PI;
+    }
+    if(inputZ==0 && inputX==-1)
+    {
+      //right
+      player.rotation.y = CameraRotationX.value + Math.PI*0;
+    }
+    if(inputZ==1 && inputX==1)
+    {
+      //up left
+      player.rotation.y = CameraRotationX.value + Math.PI*0.75;
+    }
+    if(inputZ==-1 && inputX==1)
+    {
+      //down left
+      player.rotation.y = CameraRotationX.value - Math.PI*0.75;
+    }
+    if(inputZ==1 && inputX==-1)
+    {
+      //right up
+      player.rotation.y = CameraRotationX.value + Math.PI*0.25;
+    }
+    if(inputZ==-1 && inputX==-1)
+    {
+      //right down
+      player.rotation.y = CameraRotationX.value - Math.PI*0.25;
+    }
   }
 
-  //else if
+
   const yaw = player.rotation.y;
   if (hypotenuse > 0) 
   {
-    inputX /= hypotenuse;
-    inputZ /= hypotenuse;
-    const dirX = -Math.sin(yaw) * inputZ - Math.cos(yaw) * inputX;
-    const dirZ = -Math.cos(yaw) * inputZ + Math.sin(yaw) * inputX;
-    console.log(dirX);
-    console.log(dirZ);
-    //player.position.x += dirX * speed * dt;
-    //player.position.z += dirZ * speed * dt;
+    //inputX /= hypotenuse;
+    //inputZ /= hypotenuse;
+    const dirZ = -Math.cos(yaw);
+    const dirX = -Math.sin(yaw)
+    player.position.z += speed*dt * dirZ;
+    player.position.x += speed*dt * dirX;
   }
 
 
@@ -141,7 +179,7 @@ onBeforeRender(({ delta,elapsed }) => {
 
 
 
-  // skok + grawitacja
+  // jump + gravity
   if (keys.Space && grounded) {
     velocityY = JUMP_SPEED
     grounded = false
@@ -154,11 +192,11 @@ onBeforeRender(({ delta,elapsed }) => {
     grounded = true;
   }
 
-  // granice podłogi
+  // space limit
   player.position.x = THREE.MathUtils.clamp(player.position.x, -props.limit, props.limit)
   player.position.z = THREE.MathUtils.clamp(player.position.z, -props.limit, props.limit)
 
-  // kamera za plecami postaci
+  //camera
   desired.set(
     player.position.x + Math.cos(CameraRotationX.value)* CAM_DISTANCE,
     player.position.y * 0.5 + CAM_HEIGHT ,
