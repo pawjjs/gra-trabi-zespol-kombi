@@ -1,9 +1,12 @@
 <script setup >
-import { onBeforeUnmount, onMounted, shallowRef, reactive, ref, watch } from 'vue'
-import { useLoop } from '@tresjs/core'
+import { onBeforeUnmount, onMounted, shallowRef, ref, watch } from 'vue';
+import { useLoop , useTres} from '@tresjs/core';
 import * as THREE from 'three';
-import Model from './Model.vue'
+import Model from './Model.vue';
 import {useMouse} from '@vueuse/core';
+import { Html } from '@tresjs/cientos';
+import { PCFShadowMap } from 'three';
+import { BoxGeometry, Mesh, MeshBasicMaterial } from 'three';
 
 const props = defineProps({
   path: {type: String},
@@ -18,6 +21,8 @@ const props = defineProps({
  limit: {type: Number, default: 24}//limit area
 });
 
+const { scene, renderer, camera, sizes, invalidate, advance } = useTres();
+
 let CAM_DISTANCE = 3.5;
 const CAM_HEIGHT = 2;
 const CAM_LOOK_HEIGHT = 1.5;
@@ -31,6 +36,7 @@ const { x, y, sourceType } = useMouse({ type: 'movement' });
 const CameraRotationX = ref(-Math.PI/2);
 //const CameraRotationY = ref(CAM_HEIGHT);
 
+const playerLabel = shallowRef();
 const playerRef = shallowRef();
 const cameraRef = shallowRef();
 let cameraReady = false;
@@ -44,9 +50,6 @@ const JUMP_SPEED = 7
 const GRAVITY = 20;
 let velocityY = 0;
 let grounded = true;
-
-
-
 
 //set key[Event.code] = true
 const onKeyDown = (e) => {
@@ -84,16 +87,29 @@ const onMouseClick = (e) => {
 const scroll = (e) => {
   if(e.deltaY < 0 && CAM_DISTANCE>1.3){
     CAM_DISTANCE -= 0.1;
-    CAM_HEIGHT += 0.1;
   }
-  if(e.deltaY > 0 && CAM_DISTANCE<7){
+  if(e.deltaY > 0 && CAM_DISTANCE<5){
     CAM_DISTANCE += 0.1;
-    CAM_HEIGHT -= 0.1;
   }
 }
 
 onMounted(() => {
+  const geometry = new BoxGeometry(1, 1, 1)
+  const material = new MeshBasicMaterial({ color: 0x00FF00 })
+  const cube = new Mesh(geometry, material)
 
+  // Add directly to the scene
+  scene.value.add(cube)
+  //renderer.shadowMap.enabled = true
+  //renderer.shadowMap.type = PCFShadowMap
+
+  //console.log('Canvas size:', sizes.width.value, sizes.height.value)
+  //console.log(scene.value);
+  //console.log(renderer);
+  //console.log(camera.value);
+  //console.log(sizes);
+  //console.log(invalidate);
+  //console.log(advance());
   window.addEventListener('wheel',scroll);
   window.addEventListener('mousedown',onMouseClick);
   window.addEventListener('keydown', onKeyDown);
@@ -106,12 +122,12 @@ const { onBeforeRender } = useLoop();
 onBeforeRender(({ delta,elapsed }) => {
   const player = playerRef.value;
   const camera = cameraRef.value;
+  const label = playerLabel.value;
   if (!player || !camera) {
     return;
   }
   const dt = Math.min(delta, 0.05);
   const speed = MOVE_SPEED * (keys.ShiftLeft ? SPRINT_MULT : 1);
-
 
   let inputZ = (keys.KeyW ? 1 : 0) - (keys.KeyS ? 1 : 0); // +1 forward; -1 backward
   let inputX = (keys.KeyA ? 1 : 0) - (keys.KeyD ? 1 : 0); // +1 left;    -1 right
@@ -160,24 +176,15 @@ onBeforeRender(({ delta,elapsed }) => {
       player.rotation.y = CameraRotationX.value - Math.PI*0.25;
     }
   }
-
-
+  
   const yaw = player.rotation.y;
   if (hypotenuse > 0) 
   {
-    //inputX /= hypotenuse;
-    //inputZ /= hypotenuse;
     const dirZ = -Math.cos(yaw);
-    const dirX = -Math.sin(yaw)
+    const dirX = -Math.sin(yaw);
     player.position.z += speed*dt * dirZ;
     player.position.x += speed*dt * dirX;
   }
-
-
-
-
-
-
 
   // jump + gravity
   if (keys.Space && grounded) {
@@ -213,9 +220,15 @@ onBeforeRender(({ delta,elapsed }) => {
     CAM_LOOK_HEIGHT + player.position.y * 0.5 ,
     player.position.z
   );
-  camera.lookAt(lookTarget)
-})
+  camera.lookAt(lookTarget);
 
+  //console.log(label.instance.position);
+  label.instance.position.set(
+    player.position.x,
+    player.position.y + CAM_HEIGHT ,
+    player.position.z
+  );
+})
 
 watch([x, y],
   ([newX, newY], [oldX, oldY]) => {
@@ -248,4 +261,17 @@ onBeforeUnmount(() => {
       <Model :path="path" cast-shadow/>
     </TresGroup>
   </TresGroup>
+  <Html ref="playerLabel">
+    <div class="my-label">
+        <p>Player1 <b>14  LVL</b></p>
+    </div>
+  </Html>
 </template>
+
+<style scoped>
+.my-label p{
+  background-color: white;
+  color: rgb(56, 56, 0);
+  padding: 0.1vw;
+}
+</style>

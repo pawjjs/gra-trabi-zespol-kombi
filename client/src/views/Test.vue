@@ -8,7 +8,6 @@ import * as THREE from 'three';
 import { usePointerLock } from '@vueuse/core';
 
 import Player from './Player.vue';
-import './test.css';
 //<------------------------------------------------------------------------->
 
 const mouseHover = ref(0);//0 false, 1 true
@@ -73,3 +72,11 @@ const {
             </TresCanvas>
     </div>
 </template>
+
+<style lang="css" scoped>
+.test{
+    width: 99.4%;
+    height: 98%;
+    padding: 0.3vw;
+}
+</style>

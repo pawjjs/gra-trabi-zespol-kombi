@@ -1,4 +1,9 @@
 import express from 'express';
+import swaggerUi from "swagger-ui-express";
+import YAML from "yaml";
+import { WebSocketServer } from 'ws';
+import http from 'node:http';
+import { readFileSync } from "node:fs";
 import { initializeApp } from "firebase-admin/app";
 import { getAuth } from 'firebase-admin/auth';
 
@@ -6,15 +11,35 @@ import { firebaseConfig }  from './firebase.js';
 import { useRegisterFirebaseUser } from './hooks/useRegisterFirebaseUser.js';
 
 const app = express();
+const server = http.createServer(app);
+const wss = new WebSocketServer({server:server});
 
 // <Middleware>:
 app.use(express.json());//Ability thats gives POST data as JSON's. Parsing request body in JSON format:
 
+const spec = YAML.parse(
+  readFileSync(new URL("./openapi.yaml", import.meta.url), "utf8")
+);
+app.use("/machines-api-docs", swaggerUi.serve, swaggerUi.setup(spec));//API Documentation
+
+// <WebSockets>:
+wss.on("connection", (client) => {
+	client.send("Hello World")
+	client.on("message",(n)=>{
+		console.log(n);
+		client.send(n); //send you n back :P
+	})
+})
 
 // <EndPoints>:
 app.get('/api/firebase-config', (request, response) => 
 {
-  response.json(firebaseConfig);
+  if(!firebaseConfig){
+    response.status(404).json({ error: "Cannot reach firebase configuration" })
+  }
+  else{
+    response.status(200).json(firebaseConfig);
+  }
 });
 
 //Server side - claimtoken
@@ -57,14 +82,12 @@ app.post('/api/firebase/register', async (request, response) =>
   }
 });
 
-
-
-app.use((req, res, next) => {
-  console.log("Not Found : 404")
-  res.status(404);
-});
+//app.use((req, res, next) => {
+//  console.log("Not Found : 404")
+//  res.status(404);
+//});
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-app.listen(process.env.NODE_PORT, () => console.log('API: http://localhost:'+process.env.NODE_PORT));
+server.listen(process.env.NODE_PORT, () => console.log('API: http://localhost:'+process.env.NODE_PORT));
 
 
 // <Notes/OtherStuff>:

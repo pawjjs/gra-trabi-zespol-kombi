@@ -6,7 +6,6 @@ import { doc, getDoc } from 'firebase/firestore';
 
 import { useApiRequest } from '../../hooks/useRequest.js';
 import { useFirebase } from '../../store/firebase.js';
-
 import Nexus from '../Nexus/Nexus.vue';
 
 const firebase = useFirebase();
@@ -85,5 +84,21 @@ const handleLogOut = async () => {
 }
 .user-name{
     color: wheat;
+}
+
+button {
+  margin-top: 0.2vw;
+  padding: 0.44vw;
+  font-size: 1vw;
+  font-weight: 700;
+  color: #000;
+  background: #ffeb00;
+  border: 0.2vw solid #000;
+  border-radius: 1vw;
+
+  cursor: pointer;
+}
+button:hover {
+  background: #fff35c;
 }
 </style>
