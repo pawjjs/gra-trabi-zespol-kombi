@@ -8,29 +8,32 @@ import 'vue3-toastify/dist/index.css';
 import { useApiRequest } from '../../hooks/useRequest.js';
 import { useFirebase  } from '../../store/firebase.js';
 import InputField from './InputField.vue';
-import './form.css';
-
+//-----------------------------------------------------------------------------
 const props = defineProps
 ({
   type: { type: String, default: 'L' },
 });
-const router = useRouter();
-const isRegister = computed(() => props.type === 'R');
 
+const isRegister = computed(() => props.type === 'R');
 const nick = ref('');
 const email = ref('');
 const password = ref('');
 
+const router = useRouter();
 const firebase = useFirebase();
 
+watchEffect(async () => {
+  if(firebase.isAuthenticated)
+  {
+    router.push('/home');
+  }
+})
 
 const errors = reactive({
   emailValid : '',
   isPasswordStrong: ''
   //TODO: make file validation
 });
-
-
 
 const toastNotify = (textArgument) => {
   toast(textArgument,
@@ -102,7 +105,11 @@ const handleSubmitRegister = async (e) => {
     {
       throw data.message || response.statusText;
     }
-    console.log("Register Success");
+    toastNotify("Register Success");
+    await firebase.login(email.value ,password.value);
+    const jsonResponse = await useApiRequest('POST', '/api/firebase-claim-token', { x: 8 })
+    .catch((err) => { throw err }) 
+    router.push('/home');
   } 
   catch (error) 
   {
@@ -222,3 +229,68 @@ const handleSubmitLogin = async (e) => {
     </nav>
   </div>
 </template>
+
+<style scoped>
+.auth {
+  max-width: 40vw;
+  margin: 0 auto;
+  padding: 1vw 1vw;
+  color: #222;
+}
+h2.form-label {
+  margin: 0 0 1vw;
+  font-size: 2vw;
+  text-align: center;
+  color: white;
+  text-shadow: 0.1vw 0.1vw rgb(95, 95, 0), 0.2vw 0.2vw 0.3vw #000000;
+}
+nav {
+  margin-top: 0.77vw;
+  text-align: center;
+  font-size: 1vw;
+}
+nav a {
+  color: rgb(0, 0, 0);
+  text-decoration: underline;
+  padding: 0.2vw;
+  transition: color 0.5s;
+}
+nav a:hover{
+  color: rgb(94, 116, 17);
+}
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+button {
+  margin-top: 0.2vw;
+  padding: 0.44vw;
+  font-size: 1vw;
+  font-weight: 700;
+  color: #000;
+  background: #ffeb00;
+  border: 0.2vw solid #000;
+  border-radius: 1vw;
+
+  cursor: pointer;
+}
+button:hover {
+  background: #fff35c;
+}
+::placeholder{
+  text-align: center; 
+}
+input {
+  padding: 0.251vw 1vw;
+  font-size: 0.88vw;
+  color: #111;
+  background: #fff;
+  border: 1px solid #bbb;
+  border-radius: 1vw;
+}
+input:focus {
+  outline: 0.1vw solid #ffeb00;
+  border-color: #111;
+}
+</style>

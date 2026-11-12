@@ -1,12 +1,10 @@
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { useAuth } from '@vueuse/firebase/useAuth'
-import { signInWithEmailAndPassword  } from '@firebase/auth';
 import { getFirestore , getDoc, doc, updateDoc } from "firebase/firestore";
-import { getAnalytics } from "firebase/analytics";
 import { defineStore } from "pinia";
 import { toast } from 'vue3-toastify';
-import { ref } from "vue";
+import { ref , watch} from "vue";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -33,7 +31,6 @@ export const useFirebase = defineStore('firebase', () =>
   
   }
   */
-
   const firebaseConfig = {
     apiKey: import.meta.env.VITE_API_KEY,
     authDomain: import.meta.env.VITE_AUTH_DOMAIN,
@@ -46,49 +43,30 @@ export const useFirebase = defineStore('firebase', () =>
   const firebaseApp = initializeApp(firebaseConfig);
   const auth = getAuth(firebaseApp);
   const db = getFirestore(firebaseApp);
-
+  const userSnapshot = ref();// JS-12-11-2026
   const { isAuthenticated, user } = useAuth(auth);//Client side auth-Hook
-
   const isAuthReady = ref(false);
-  auth.authStateReady()
-  .then(() => {
-    isAuthReady.value = true;
-  })
-
-
-  const login = async (email, password) => 
-  {
+  
+  const login = async (email, password) => {
     return signInWithEmailAndPassword(auth, email, password)
-      .then(async () => 
-      {
+      .then(async () => {
         const UserRef = doc(db, 'Users', auth.currentUser.uid);
         const UserSnap = await getDoc(UserRef);
-        if (UserSnap.exists()) 
-        {
+        if (UserSnap.exists()) {
           await updateDoc(UserRef, {
             online: true
-          })
+          });
+          userSnapshot.value = UserSnap.data()// JS-12-11-2026
         }
-        else
-        {
+        else{
           throw `User snapshot doesn't exist`;  
         }
         return true;
       })
-      .catch((error) => 
-      {
-        toast(error.message,
-        {
-          autoClose: 1500,
-          type: 'warning',
-          theme: "dark",
-          position: "bottom-center", 
-          transition: "slide"
-        }); 
-        return false;
+      .catch((error) => {
+        throw new Error(error);
       })
   }
-
   const logout = async () => {
     const UserRef = doc(db, "Users", auth.currentUser.uid);
     const UserSnap = await getDoc(UserRef);
@@ -98,8 +76,20 @@ export const useFirebase = defineStore('firebase', () =>
         online: false
       })
     }
-    await auth.signOut();//NET::ERR_BLOCKED_BY_CLIENT wyłącz Brave tarcze
+    await auth.signOut();//NET::ERR_BLOCKED_BY_CLIENT turn off Brave Shield
   };
+
+  auth.authStateReady()
+  .then(() => {
+    isAuthReady.value = true;
+  })
+
+  watch(userSnapshot, async (to, from) => {// JS-12-11-2026
+    if (!from || !to) return // ignorujemy jezeli wczesniej byl null, lub jezeli teraz jest null// JS-12-11-2026
+    await updateDoc(UserRef, to)// JS-12-11-2026
+  })// JS-12-11-2026
+  
+
 
   return { 
     //<Objects>:
@@ -110,9 +100,11 @@ export const useFirebase = defineStore('firebase', () =>
     isAuthenticated, 
     user,
     isAuthReady,
+    userSnapshot,// JS-12-11-2026
     
     //<Functions>:
     login,
-    logout 
+    logout
+    //fetchUserData
   }
 });

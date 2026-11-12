@@ -1,7 +1,7 @@
 <script setup>
 import { useFirebase } from './store/firebase';
 import { storeToRefs } from "pinia";
-import {until} from '@vueuse/core';
+import { until } from '@vueuse/core';
 
 const store = useFirebase();
 const { isAuthReady } = storeToRefs(store);
