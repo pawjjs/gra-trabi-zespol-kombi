@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, watchEffect, ref, watch } from 'vue';
+import { onMounted, watchEffect, ref} from 'vue';
 import { storeToRefs } from "pinia";
 import { useRouter } from 'vue-router';
 import { doc, getDoc } from 'firebase/firestore';
@@ -10,9 +10,9 @@ import Nexus from '../Nexus/Nexus.vue';
 
 const firebase = useFirebase();
 const router = useRouter();
-const { user } = storeToRefs(firebase);
+const { user, userSnapshot } = storeToRefs(firebase);
 
-const userDetails = ref(null);
+/*const userDetails = ref(null);
 const fetchUserData = async () => 
 {
     const docRef = doc(firebase.db, "Users", user.value.uid);
@@ -21,7 +21,7 @@ const fetchUserData = async () =>
         userDetails.value = docSnap.data();
         console.log(userDetails.value.playerNick);//RyanGosling123 HomePage.vue:22 
     }
-};
+};*/
 
 watchEffect(async () => {
     if(!firebase.isAuthenticated){
@@ -32,7 +32,8 @@ watchEffect(async () => {
 onMounted(async () => {
     const jsonResponse = await useApiRequest('POST', '/api/firebase-claim-token', { x: 8 })
     .catch((er) => { console.log(er); })
-    await fetchUserData();
+
+    console.log(userSnapshot);
 });
 
 const handleLogOut = async () => {
@@ -51,6 +52,7 @@ const handleLogOut = async () => {
     </div>
     <div class="menu" v-else>
         <h1 class="user-name">
+            {{ firebase.user ? userSnapshot.playerNick : 'Not logged in' }}
             <!--{{ 
                 firebase.user ? userDetails.playerNick : 'Not logged in'
             }}-->

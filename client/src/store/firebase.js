@@ -4,7 +4,7 @@ import { useAuth } from '@vueuse/firebase/useAuth'
 import { getFirestore , getDoc, doc, updateDoc } from "firebase/firestore";
 import { defineStore } from "pinia";
 import { toast } from 'vue3-toastify';
-import { ref } from "vue";
+import { ref , watch} from "vue";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -43,6 +43,7 @@ export const useFirebase = defineStore('firebase', () =>
   const firebaseApp = initializeApp(firebaseConfig);
   const auth = getAuth(firebaseApp);
   const db = getFirestore(firebaseApp);
+  const userSnapshot = ref();// JS-12-11-2026
   const { isAuthenticated, user } = useAuth(auth);//Client side auth-Hook
   const isAuthReady = ref(false);
   
@@ -54,7 +55,8 @@ export const useFirebase = defineStore('firebase', () =>
         if (UserSnap.exists()) {
           await updateDoc(UserRef, {
             online: true
-          })
+          });
+          userSnapshot.value = UserSnap.data()// JS-12-11-2026
         }
         else{
           throw `User snapshot doesn't exist`;  
@@ -77,20 +79,17 @@ export const useFirebase = defineStore('firebase', () =>
     await auth.signOut();//NET::ERR_BLOCKED_BY_CLIENT turn off Brave Shield
   };
 
-  /*const fetchUserData = async () =>{
-    const docRef = doc(firebase.db, "Users", user.value.uid);
-    const docSnap = await getDoc(docRef);
-    if(docSnap.exists())
-    {
-      return docSnap.data();
-    }
-    return "User Document Snap doesnt exist";
-  };*/
-
   auth.authStateReady()
   .then(() => {
     isAuthReady.value = true;
   })
+
+  watch(userSnapshot, async (to, from) => {// JS-12-11-2026
+    if (!from || !to) return // ignorujemy jezeli wczesniej byl null, lub jezeli teraz jest null// JS-12-11-2026
+    await updateDoc(UserRef, to)// JS-12-11-2026
+  })// JS-12-11-2026
+  
+
 
   return { 
     //<Objects>:
@@ -101,10 +100,11 @@ export const useFirebase = defineStore('firebase', () =>
     isAuthenticated, 
     user,
     isAuthReady,
+    userSnapshot,// JS-12-11-2026
     
     //<Functions>:
     login,
-    logout,
+    logout
     //fetchUserData
   }
 });
