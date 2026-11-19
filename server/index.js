@@ -9,7 +9,7 @@ import { getAuth } from 'firebase-admin/auth';
 
 import { firebaseConfig }  from './firebase.js';
 import { useRegisterFirebaseUser } from './hooks/useRegisterFirebaseUser.js';
-
+//---------------------------------------------------------------------------------------------------------------------------
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocketServer({server:server});
@@ -23,12 +23,25 @@ const spec = YAML.parse(
 app.use("/machines-api-docs", swaggerUi.serve, swaggerUi.setup(spec));//API Documentation
 
 // <WebSockets>:
-wss.on("connection", (client) => {
-	client.send("Hello World")
-	client.on("message",(n)=>{
-		console.log(n);
-		client.send(n); //send you n back :P
-	})
+wss.on("connection", (webSocket) => 
+{
+  console.log('New client connected');
+	webSocket.send("Hello World");
+
+  webSocket.on("open",(n) => {
+    console.log('WebSocket connection established!');
+  });
+
+	webSocket.on("message",(n)=>
+  {
+		console.log(n.toString());//<Buffer 48 6f 70>
+		webSocket.send(`Server received: ${n}`); //send you n back :P
+	});
+
+  webSocket.on('close', () => 
+  {
+    console.log('Client disconnected');
+  });
 })
 
 // <EndPoints>:

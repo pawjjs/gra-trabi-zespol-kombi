@@ -1,11 +1,16 @@
-<script setup lang="ts">
+<script setup>
 import { computed } from 'vue'
 import { useGLTF } from '@tresjs/cientos'
 
-const props = defineProps<{ path: string }>()
-const { state } = useGLTF(props.path) as any
-const scene = computed(() => state?.value?.scene ?? state?.scene)
+const props = defineProps({ 
+  path: {type: String},
+  dracoParam: {type: Boolean, default: false},//Whether to enable Draco compression
+}) ;
 
+const { state } = useGLTF(props.path, { draco: props.dracoParam });
+const scene = computed(() => { return state?.value?.scene ?? state?.scene});
+
+//https://gltf-viewer.donmccurdy.com/
 </script>
 
 <template>

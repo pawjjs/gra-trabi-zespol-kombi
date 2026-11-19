@@ -1,4 +1,7 @@
 <script setup>
+/**
+ * @brief Component is responsible for loading entire firebase instance from Pinia
+ * */
 import { useFirebase } from './store/firebase';
 import { storeToRefs } from "pinia";
 import { until } from '@vueuse/core';

@@ -43,7 +43,19 @@ export const useFirebase = defineStore('firebase', () =>
   const firebaseApp = initializeApp(firebaseConfig);
   const auth = getAuth(firebaseApp);
   const db = getFirestore(firebaseApp);
-  const userSnapshot = ref();// JS-12-11-2026
+
+  const userSnapshot = ref();
+  watch(userSnapshot, async (to, from) => 
+  {
+    console.log(to);  //user with updated param
+    console.log(from);//undefined
+    if (!from || !to)
+    {
+      return;
+    }
+    await updateDoc(UserRef, to);
+  })
+
   const { isAuthenticated, user } = useAuth(auth);//Client side auth-Hook
   const isAuthReady = ref(false);
   
@@ -52,11 +64,10 @@ export const useFirebase = defineStore('firebase', () =>
       .then(async () => {
         const UserRef = doc(db, 'Users', auth.currentUser.uid);
         const UserSnap = await getDoc(UserRef);
-        if (UserSnap.exists()) {
-          await updateDoc(UserRef, {
-            online: true
-          });
-          userSnapshot.value = UserSnap.data()// JS-12-11-2026
+        if (UserSnap.exists()) 
+        {
+          userSnapshot.value = UserSnap.data();
+          userSnapshot.value.online = true;//watch triggers here
         }
         else{
           throw `User snapshot doesn't exist`;  
@@ -75,6 +86,7 @@ export const useFirebase = defineStore('firebase', () =>
       await updateDoc(UserRef, {
         online: false
       })
+      //userSnapshot.value.online = true;
     }
     await auth.signOut();//NET::ERR_BLOCKED_BY_CLIENT turn off Brave Shield
   };
@@ -84,11 +96,6 @@ export const useFirebase = defineStore('firebase', () =>
     isAuthReady.value = true;
   })
 
-  watch(userSnapshot, async (to, from) => {// JS-12-11-2026
-    if (!from || !to) return // ignorujemy jezeli wczesniej byl null, lub jezeli teraz jest null// JS-12-11-2026
-    await updateDoc(UserRef, to)// JS-12-11-2026
-  })// JS-12-11-2026
-  
 
 
   return { 
@@ -100,7 +107,7 @@ export const useFirebase = defineStore('firebase', () =>
     isAuthenticated, 
     user,
     isAuthReady,
-    userSnapshot,// JS-12-11-2026
+    userSnapshot,
     
     //<Functions>:
     login,

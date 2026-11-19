@@ -114,8 +114,8 @@ onBeforeUnmount(() => {
       />
     </div>
 
-    <nav class="nexus-nav">
+    <!--<nav class="nexus-nav">
       <RouterLink to="/home">Powrót do menu</RouterLink>
-    </nav>
+    </nav>-->
   </div>
 </template>

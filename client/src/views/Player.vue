@@ -1,5 +1,5 @@
 <script setup >
-import { onBeforeUnmount, onMounted, shallowRef, ref, watch } from 'vue';
+import { onBeforeUnmount, onMounted, onUnmounted, shallowRef, ref, watch } from 'vue';
 import { useLoop , useTres} from '@tresjs/core';
 import * as THREE from 'three';
 import Model from './Model.vue';
@@ -7,8 +7,9 @@ import {useMouse} from '@vueuse/core';
 import { Html } from '@tresjs/cientos';
 import { PCFShadowMap } from 'three';
 import { BoxGeometry, Mesh, MeshBasicMaterial } from 'three';
-
+//----------------------------------------------------------------------------------------------
 const props = defineProps({
+  playerLabel: {type: String, default: ""},
   path: {type: String},
   scale: {type: Number, default: 1},
   modelYaw: {type:Number, default: Math.PI},
@@ -20,8 +21,12 @@ const props = defineProps({
  hover: {type: Number, default: 1},
  limit: {type: Number, default: 24}//limit area
 });
+//-----------------------------------------------------------------------------------------------
+//https://stemkoski.github.io/Three.js/Collision-Detection.html
 
 const { scene, renderer, camera, sizes, invalidate, advance } = useTres();
+
+let socket=null;
 
 let CAM_DISTANCE = 3.5;
 const CAM_HEIGHT = 2;
@@ -46,7 +51,7 @@ const MOVE_SPEED = 2.1;
 const SPRINT_MULT = 4.8;
 const TURN_SPEED = 3.6;
 
-const JUMP_SPEED = 7
+const JUMP_SPEED = 6.7;
 const GRAVITY = 20;
 let velocityY = 0;
 let grounded = true;
@@ -57,6 +62,10 @@ const onKeyDown = (e) => {
   if (e.code === 'Space') 
   {
     e.preventDefault();
+    if (socket?.readyState === WebSocket.OPEN) 
+    {
+      socket.send("Hop"); // -> "message"
+    }
   }
   keys[e.code] = true
 }
@@ -93,6 +102,9 @@ const scroll = (e) => {
   }
 }
 
+
+
+
 onMounted(() => {
   const geometry = new BoxGeometry(1, 1, 1)
   const material = new MeshBasicMaterial({ color: 0x00FF00 })
@@ -102,6 +114,13 @@ onMounted(() => {
   scene.value.add(cube)
   //renderer.shadowMap.enabled = true
   //renderer.shadowMap.type = PCFShadowMap
+
+  socket = new WebSocket("ws://localhost:3000");//wss.on("connection")
+  socket.onopen = () => {};
+  socket.onmessage = (e) => 
+  {
+    console.log(e.data);
+  };
 
   //console.log('Canvas size:', sizes.width.value, sizes.height.value)
   //console.log(scene.value);
@@ -119,6 +138,7 @@ onMounted(() => {
 
 const { onBeforeRender } = useLoop();
 
+//elapsed - time since the begin
 onBeforeRender(({ delta,elapsed }) => {
   const player = playerRef.value;
   const camera = cameraRef.value;
@@ -187,21 +207,33 @@ onBeforeRender(({ delta,elapsed }) => {
   }
 
   // jump + gravity
-  if (keys.Space && grounded) {
-    velocityY = JUMP_SPEED
-    grounded = false
+  //if (keys.Space && grounded) 
+  if (keys.Space) 
+  {
+    velocityY = JUMP_SPEED;
+    //grounded = false;
   }
-  velocityY -= GRAVITY * dt
-  player.position.y += velocityY * dt
-  if (player.position.y <= 0) {
+  velocityY -= GRAVITY * dt;
+  player.position.y += velocityY * dt;
+  //if (player.position.y <= 0)
+ // {
+    
+    //grounded = true;
+  //}
+
+  player.position.y = THREE.MathUtils.clamp(player.position.y, 0, 10);
+  /*if (player.position.y <= 0)
+  {
     player.position.y = 0;
     velocityY = 0;
     grounded = true;
-  }
+  }*/
 
   // space limit
-  player.position.x = THREE.MathUtils.clamp(player.position.x, -props.limit, props.limit)
-  player.position.z = THREE.MathUtils.clamp(player.position.z, -props.limit, props.limit)
+  player.position.x = THREE.MathUtils.clamp(player.position.x, -props.limit, props.limit);
+  player.position.z = THREE.MathUtils.clamp(player.position.z, -props.limit, props.limit);
+
+  
 
   //camera
   desired.set(
@@ -251,7 +283,11 @@ onBeforeUnmount(() => {
   window.removeEventListener('blur', releaseAll);
   window.removeEventListener('wheel',scroll);
   window.removeEventListener('mousedown',onMouseClick);
-})
+});
+
+onUnmounted(() => {
+  socket?.close()
+});
 </script>
 
 <template>
@@ -263,7 +299,7 @@ onBeforeUnmount(() => {
   </TresGroup>
   <Html ref="playerLabel">
     <div class="my-label">
-        <p>Player1 <b>14  LVL</b></p>
+        <p>{{props.playerLabel}}</p>
     </div>
   </Html>
 </template>
