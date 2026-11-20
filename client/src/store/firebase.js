@@ -1,10 +1,10 @@
-import { initializeApp } from "firebase/app";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import { useAuth } from '@vueuse/firebase/useAuth'
-import { getFirestore , getDoc, doc, updateDoc } from "firebase/firestore";
-import { defineStore } from "pinia";
-import { toast } from 'vue3-toastify';
-import { ref , watch} from "vue";
+import { initializeApp }                                     from "firebase/app";
+import { getAuth, signInWithEmailAndPassword }               from "firebase/auth";
+import { useAuth }                                           from '@vueuse/firebase/useAuth'
+import { getFirestore , getDoc, doc, updateDoc , Timestamp } from "firebase/firestore";
+import { defineStore }                                       from "pinia";
+import { nextTick, ref , watch}                              from "vue";
+import { useStorage }                                        from '@vueuse/core'
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -44,19 +44,29 @@ export const useFirebase = defineStore('firebase', () =>
   const auth = getAuth(firebaseApp);
   const db = getFirestore(firebaseApp);
 
-  const userSnapshot = ref();
+  const userID = useStorage('userID',undefined);
+  const userSnapshot = useStorage('userSnapshot',undefined,undefined,
+    {
+       serializer: {
+          read: (v) => v ? JSON.parse(v):undefined,
+          write:(v) => JSON.stringify(v)
+       }
+    }
+  );
   watch(userSnapshot, async (to, from) => 
   {
-    console.log(to);  //user with updated param
+    console.log(to?.online); //user with updated param
     console.log(from);//undefined
     if (!from || !to)
     {
       return;
     }
-    await updateDoc(UserRef, to);
-  })
+    const userRef = doc(db, 'Users', userID.value);
+    await updateDoc(userRef, to);
+},
+{ deep: true });
 
-  const { isAuthenticated, user } = useAuth(auth);//Client side auth-Hook
+  const { isAuthenticated, user } = useAuth(auth);
   const isAuthReady = ref(false);
   
   const login = async (email, password) => {
@@ -66,8 +76,10 @@ export const useFirebase = defineStore('firebase', () =>
         const UserSnap = await getDoc(UserRef);
         if (UserSnap.exists()) 
         {
+          userID.value = auth.currentUser.uid;
           userSnapshot.value = UserSnap.data();
-          userSnapshot.value.online = true;//watch triggers here
+          userSnapshot.value.online = true;
+          userSnapshot.value.ping = Timestamp.fromDate(new Date());
         }
         else{
           throw `User snapshot doesn't exist`;  
@@ -79,16 +91,15 @@ export const useFirebase = defineStore('firebase', () =>
       })
   }
   const logout = async () => {
-    const UserRef = doc(db, "Users", auth.currentUser.uid);
-    const UserSnap = await getDoc(UserRef);
-    if (UserSnap.exists()) 
+    if (userSnapshot.value) 
     {
-      await updateDoc(UserRef, {
-        online: false
-      })
-      //userSnapshot.value.online = true;
+      userSnapshot.value.online = false;
+      userSnapshot.value.ping = Timestamp.fromDate(new Date());
+      await nextTick();     //ping = null ??????
+      userSnapshot.value = undefined;
+      userID.value = undefined;
     }
-    await auth.signOut();//NET::ERR_BLOCKED_BY_CLIENT turn off Brave Shield
+    await auth.signOut();
   };
 
   auth.authStateReady()

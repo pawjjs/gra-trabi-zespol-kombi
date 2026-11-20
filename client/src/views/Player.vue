@@ -153,48 +153,11 @@ onBeforeRender(({ delta,elapsed }) => {
   let inputX = (keys.KeyA ? 1 : 0) - (keys.KeyD ? 1 : 0); // +1 left;    -1 right
   const hypotenuse = Math.hypot(inputX, inputZ);// AND = 1.41 , NAND = 1
 
+
+
   if(inputZ != 0 || inputX != 0)
   {
-    if(inputZ==1 && inputX==0)
-    {
-      //up
-      player.rotation.y = CameraRotationX.value + Math.PI*0.5;
-    }
-    if(inputZ==-1 && inputX==0)
-    {
-      //down
-      player.rotation.y = CameraRotationX.value - Math.PI*0.5;
-    }
-    if(inputZ==0 && inputX==1)
-    {
-      //left
-      player.rotation.y = CameraRotationX.value + Math.PI;
-    }
-    if(inputZ==0 && inputX==-1)
-    {
-      //right
-      player.rotation.y = CameraRotationX.value + Math.PI*0;
-    }
-    if(inputZ==1 && inputX==1)
-    {
-      //up left
-      player.rotation.y = CameraRotationX.value + Math.PI*0.75;
-    }
-    if(inputZ==-1 && inputX==1)
-    {
-      //down left
-      player.rotation.y = CameraRotationX.value - Math.PI*0.75;
-    }
-    if(inputZ==1 && inputX==-1)
-    {
-      //right up
-      player.rotation.y = CameraRotationX.value + Math.PI*0.25;
-    }
-    if(inputZ==-1 && inputX==-1)
-    {
-      //right down
-      player.rotation.y = CameraRotationX.value - Math.PI*0.25;
-    }
+    player.rotation.y = CameraRotationX.value + Math.atan2(inputX,inputZ) + Math.PI*0.5;
   }
   
   const yaw = player.rotation.y;

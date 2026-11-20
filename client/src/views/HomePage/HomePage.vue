@@ -9,19 +9,12 @@ import { useFirebase } from '../../store/firebase.js';
 import Nexus from '../Nexus/Nexus.vue';
 
 const firebase = useFirebase();
-const { user } = storeToRefs(firebase);
+//const { user } = storeToRefs(firebase);
 
-const userDetails = ref(null);
-const fetchUserData = async () => 
-{
-    const docRef = doc(firebase.db, "Users", user.value.uid);
-    const docSnap = await getDoc(docRef);
-    if(docSnap.exists())
-    {
-        userDetails.value = docSnap.data();
-        console.log(userDetails.value.playerNick);
-    }
-};
+const { userSnapshot } = storeToRefs(firebase);
+
+
+
 
 const router = useRouter();
 watchEffect(async () => {
@@ -33,9 +26,6 @@ watchEffect(async () => {
 onMounted(async () => {
     const jsonResponse = await useApiRequest('POST', '/api/firebase-claim-token', { x: 8 })
     .catch((er) => { console.log(er); })
-
-    await fetchUserData();
-
 });
 
 const handleLogOut = async () => {
@@ -60,7 +50,7 @@ const handlePlay = () => {
     <div class="menu" v-else>
         <div class="top">
             <h1 class="user-name">
-                {{ firebase.user ? userDetails?.playerNick : 'Not logged in' }}
+                {{ firebase.user ? userSnapshot?.playerNick : 'Not logged in' }}
             </h1>
             <div class="avatar-img">
                 <!--Avater Here-->

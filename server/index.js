@@ -23,6 +23,14 @@ const spec = YAML.parse(
 app.use("/machines-api-docs", swaggerUi.serve, swaggerUi.setup(spec));//API Documentation
 
 // <WebSockets>:
+/*
+Event	Description
+connection (server)	-Fired when a client connects to the server
+open (client)	-Fired when the connection is established
+message	-Fired when a message is received
+error	-Fired when an error occurs
+close -Fired when the connection is closed
+*/
 wss.on("connection", (webSocket) => 
 {
   console.log('New client connected');
