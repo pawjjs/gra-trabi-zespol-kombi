@@ -2,11 +2,14 @@
 import { onBeforeUnmount, onMounted, onUnmounted, shallowRef, ref, watch } from 'vue';
 import { useLoop , useTres} from '@tresjs/core';
 import * as THREE from 'three';
-import Model from './Model.vue';
 import {useMouse} from '@vueuse/core';
 import { Html } from '@tresjs/cientos';
 import { PCFShadowMap } from 'three';
 import { BoxGeometry, Mesh, MeshBasicMaterial } from 'three';
+
+import { io } from "socket.io-client";
+import Model from './Model.vue';
+import CollisionShape3D from '../components/Tres3D/CollisionShape3D.vue';
 //----------------------------------------------------------------------------------------------
 const props = defineProps({
   playerLabel: {type: String, default: ""},
@@ -22,15 +25,24 @@ const props = defineProps({
  limit: {type: Number, default: 24}//limit area
 });
 //-----------------------------------------------------------------------------------------------
+const leadValue = () => {
+
+}
+//-----------------------------------------------------------------------------------------------
 //https://stemkoski.github.io/Three.js/Collision-Detection.html
 
 const { scene, renderer, camera, sizes, invalidate, advance } = useTres();
 
-let socket=null;
+//let socket=null;
+/*const socket = io("http://localhost:3000", {
+  dupa: "dupa123",
+  auth: { token: "twoj-token", dupa:"dupa" },
+  autoConnect: true,
+});*/
 
 let CAM_DISTANCE = 3.5;
 const CAM_HEIGHT = 2;
-const CAM_LOOK_HEIGHT = 1.5;
+const CAM_LOOK_HEIGHT = 1.45;
 const CAM_SMOOTH = 100;
 
 const desired = new THREE.Vector3();
@@ -39,7 +51,7 @@ const lookTarget = new THREE.Vector3();
 const keys = {};// Array which keys are pressed <boolean>
 const { x, y, sourceType } = useMouse({ type: 'movement' });
 const CameraRotationX = ref(-Math.PI/2);
-//const CameraRotationY = ref(CAM_HEIGHT);
+const CameraRotationY = ref(-Math.PI/2);
 
 const playerLabel = shallowRef();
 const playerRef = shallowRef();
@@ -51,21 +63,17 @@ const MOVE_SPEED = 2.1;
 const SPRINT_MULT = 4.8;
 const TURN_SPEED = 3.6;
 
-const JUMP_SPEED = 6.7;
+const JUMP_SPEED = 8.7;
 const GRAVITY = 20;
 let velocityY = 0;
 let grounded = true;
 
 //set key[Event.code] = true
 const onKeyDown = (e) => {
-  console.log(e.code);
+  //console.log(e.code);
   if (e.code === 'Space') 
   {
     e.preventDefault();
-    if (socket?.readyState === WebSocket.OPEN) 
-    {
-      socket.send("Hop"); // -> "message"
-    }
   }
   keys[e.code] = true
 }
@@ -102,25 +110,24 @@ const scroll = (e) => {
   }
 }
 
-
-
-
 onMounted(() => {
-  const geometry = new BoxGeometry(1, 1, 1)
-  const material = new MeshBasicMaterial({ color: 0x00FF00 })
-  const cube = new Mesh(geometry, material)
+ // const geometry = new BoxGeometry(1, 1, 1)
+ // const material = new MeshBasicMaterial({ color: 0x00FF00 })
+ // const cube = new Mesh(geometry, material)
 
   // Add directly to the scene
-  scene.value.add(cube)
+  //scene.value.add(cube)
   //renderer.shadowMap.enabled = true
   //renderer.shadowMap.type = PCFShadowMap
 
-  socket = new WebSocket("ws://localhost:3000");//wss.on("connection")
-  socket.onopen = () => {};
-  socket.onmessage = (e) => 
-  {
-    console.log(e.data);
-  };
+  //socket = new WebSocket("ws://localhost:3000");//wss.on("connection")
+  //socket.onopen = () => {};
+  //socket.onmessage = (e) => 
+  //{
+  //  console.log(e.data);
+  //};
+  
+  //socket.emit('uwu', "dupa");
 
   //console.log('Canvas size:', sizes.width.value, sizes.height.value)
   //console.log(scene.value);
@@ -153,14 +160,13 @@ onBeforeRender(({ delta,elapsed }) => {
   let inputX = (keys.KeyA ? 1 : 0) - (keys.KeyD ? 1 : 0); // +1 left;    -1 right
   const hypotenuse = Math.hypot(inputX, inputZ);// AND = 1.41 , NAND = 1
 
-
-
   if(inputZ != 0 || inputX != 0)
   {
     player.rotation.y = CameraRotationX.value + Math.atan2(inputX,inputZ) + Math.PI*0.5;
   }
-  
+
   const yaw = player.rotation.y;
+  //console.log(yaw);
   if (hypotenuse > 0) 
   {
     const dirZ = -Math.cos(yaw);
@@ -171,37 +177,33 @@ onBeforeRender(({ delta,elapsed }) => {
 
   // jump + gravity
   //if (keys.Space && grounded) 
-  if (keys.Space) 
+  if (keys.Space)
   {
     velocityY = JUMP_SPEED;
     //grounded = false;
+    //if (socket?.readyState === WebSocket.OPEN) 
+    //{
+    //  socket.send("Hop"); // -> "message"
+    //}
   }
   velocityY -= GRAVITY * dt;
   player.position.y += velocityY * dt;
-  //if (player.position.y <= 0)
- // {
-    
-    //grounded = true;
-  //}
-
   player.position.y = THREE.MathUtils.clamp(player.position.y, 0, 10);
-  /*if (player.position.y <= 0)
+  if (player.position.y <= 0)
   {
-    player.position.y = 0;
+  //  player.position.y = 0;
     velocityY = 0;
-    grounded = true;
-  }*/
+    //grounded = true;
+  }
 
   // space limit
   player.position.x = THREE.MathUtils.clamp(player.position.x, -props.limit, props.limit);
   player.position.z = THREE.MathUtils.clamp(player.position.z, -props.limit, props.limit);
 
-  
-
   //camera
   desired.set(
     player.position.x + Math.cos(CameraRotationX.value)* CAM_DISTANCE,
-    player.position.y * 0.5 + CAM_HEIGHT ,
+    player.position.y - Math.cos(CameraRotationY.value)*2 + CAM_HEIGHT,
     player.position.z - Math.sin(CameraRotationX.value)* CAM_DISTANCE,
   );
   if (!cameraReady) {
@@ -212,7 +214,7 @@ onBeforeRender(({ delta,elapsed }) => {
   }
   lookTarget.set(
     player.position.x, 
-    CAM_LOOK_HEIGHT + player.position.y * 0.5 ,
+    player.position.y + CAM_LOOK_HEIGHT,
     player.position.z
   );
   camera.lookAt(lookTarget);
@@ -228,15 +230,16 @@ onBeforeRender(({ delta,elapsed }) => {
 watch([x, y],
   ([newX, newY], [oldX, oldY]) => {
     CameraRotationX.value += -newX * TURN_SPEED * 0.0005;
+    CameraRotationY.value += -newY * TURN_SPEED * 0.0005;
 
-    /*CameraRotationY.value += -newY * TURN_SPEED * 0.0005;
-    if(CameraRotationY.value >= Math.PI/2){
-      CameraRotationY.value = Math.PI/2;
+    if(CameraRotationY.value >= 0)
+    {
+      CameraRotationY.value = 0;
     }
-    if(CameraRotationY.value <= -Math.PI){
-      CameraRotationY.value = -Math.PI;
+    if(CameraRotationY.value <= -3)
+    {
+      CameraRotationY.value = -3;
     }
-    console.log(CameraRotationY.value);*/
   }
 )
 
@@ -249,7 +252,7 @@ onBeforeUnmount(() => {
 });
 
 onUnmounted(() => {
-  socket?.close()
+  //socket?.close()
 });
 </script>
 
@@ -258,6 +261,10 @@ onUnmounted(() => {
   <TresGroup ref="playerRef">
     <TresGroup :rotation="[0, modelYaw, 0]" :scale="[scale, scale, scale]" cast-shadow>
       <Model :path="path" cast-shadow/>
+      <CollisionShape3D 
+      :position="[0,playerRef?.position?.y+1,0]"
+      :scale="[0.55,1.9,0.55]"
+      />
     </TresGroup>
   </TresGroup>
   <Html ref="playerLabel">

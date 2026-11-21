@@ -1,12 +1,19 @@
 <script setup>
 import { useGLTF, useAnimations } from '@tresjs/cientos'
+import { onMounted } from 'vue';
 
 const { state, isLoading , isReady, error } = await useGLTF('/glbModels/Helicopter/animated_civilian_helicopter/scene.gltf');
+
 const scene = state.value.scene;
 const animations = state.value.animations;
+
 const { actions } = useAnimations(animations, scene)
 
-Object.values(actions)[0]?.play();
+onMounted(() => {
+    Object.values(actions)[0]?.play();
+})
+
+
 </script>
 
 <template>

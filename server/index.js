@@ -2,6 +2,7 @@ import express from 'express';
 import swaggerUi from "swagger-ui-express";
 import YAML from "yaml";
 import { WebSocketServer } from 'ws';
+import { Server } from 'socket.io';
 import http from 'node:http';
 import { readFileSync } from "node:fs";
 import { initializeApp } from "firebase-admin/app";
@@ -9,33 +10,59 @@ import { getAuth } from 'firebase-admin/auth';
 
 import { firebaseConfig }  from './firebase.js';
 import { useRegisterFirebaseUser } from './hooks/useRegisterFirebaseUser.js';
+
+import { Object3D } from './data/Object.js';
+import { Player } from './data/Player.js';
 //---------------------------------------------------------------------------------------------------------------------------
 const app = express();
 const server = http.createServer(app);
-const wss = new WebSocketServer({server:server});
+const io = new Server(server,{
+  cors: {
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"],
+  },
+});
+//const wss = new WebSocketServer({server:server});
 
 // <Middleware>:
 app.use(express.json());//Ability thats gives POST data as JSON's. Parsing request body in JSON format:
 
+//<API Documentation>:
 const spec = YAML.parse(
   readFileSync(new URL("./openapi.yaml", import.meta.url), "utf8")
 );
-app.use("/machines-api-docs", swaggerUi.serve, swaggerUi.setup(spec));//API Documentation
+app.use("/machines-api-docs", swaggerUi.serve, swaggerUi.setup(spec));
 
 // <WebSockets>:
 /*
-Event	Description
-connection (server)	-Fired when a client connects to the server
-open (client)	-Fired when the connection is established
-message	-Fired when a message is received
-error	-Fired when an error occurs
-close -Fired when the connection is closed
+  Event	Description
+  connection (server)	-Fired when a client connects to the server
+  open (client)	-Fired when the connection is established
+  message	-Fired when a message is received
+  error	-Fired when an error occurs
+  close -Fired when the connection is closed
 */
-wss.on("connection", (webSocket) => 
+
+let players = Array();
+
+io.on('connection', (socket) => {
+  console.log('A user connected');
+
+  socket.on('enter world', (playerNick) => {
+      console.log(playerNick);
+      console.log(socket.handshake.auth.userID);
+      const joinedPlayer = new Player();
+      joinedPlayer.setName(playerNick);
+      players.push(joinedPlayer);
+
+      io.emit('entered world', joinedPlayer);
+  });
+});
+
+/*wss.on("connection", (webSocket) => 
 {
   console.log('New client connected');
 	webSocket.send("Hello World");
-
   webSocket.on("open",(n) => {
     console.log('WebSocket connection established!');
   });
@@ -50,7 +77,7 @@ wss.on("connection", (webSocket) =>
   {
     console.log('Client disconnected');
   });
-})
+})*/
 
 // <EndPoints>:
 app.get('/api/firebase-config', (request, response) => 
@@ -63,7 +90,6 @@ app.get('/api/firebase-config', (request, response) =>
   }
 });
 
-//Server side - claimtoken
 app.post('/api/firebase-claim-token', async (request, response) => 
 {
   if (!request.headers.authorization?.startsWith('Bearer ')) 

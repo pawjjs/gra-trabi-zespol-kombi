@@ -6,8 +6,11 @@ import * as THREE from 'three';
 import { usePointerLock } from '@vueuse/core';
 import { useGLTF, GLTFModel , useAnimations , Stats} from '@tresjs/cientos';
 
+import DynamicModel from '../components/Tres3D/DynamicModel.vue';
+import StaticModel from '../components/Tres3D/StaticModel.vue';
+import CollisionShape3D from '../components/Tres3D/CollisionShape3D.vue';
+
 import Player from './Player.vue';
-import Model from './Model.vue';
 import Helicopter from '../components/Tres3D/Helicopter.vue';
 //<------------------------------------------------------------------------->
 //https://stemkoski.github.io/Three.js/
@@ -34,8 +37,8 @@ box.position.set(1,0.51,-1);
 
 
 const uwu = await useGLTF('/glbModels/Helicopter/animated_civilian_helicopter/scene.gltf');
-console.log(uwu);
-console.log(uwu.state.value);
+//console.log(uwu);
+//console.log(uwu.state.value);
 
 const cube123 = shallowRef();
 
@@ -46,7 +49,7 @@ const { state: texture, isLoading, error } = useLoader(
 )
 
 
-//let ws = null;
+//let ws = null; <Stats />
 
 //<TresGroup> </TresGroup>
 //<TresMesh v-bind="model" />
@@ -58,7 +61,7 @@ const { state: texture, isLoading, error } = useLoader(
     @mousemove="() => {mouseHover = 1;}"
     >
         <TresCanvas clear-color="black" @mousedown.capture="lock">
-            <Stats />
+            
             
             <TresAmbientLight :intensity="1" cast-shadow />
 
@@ -95,17 +98,16 @@ const { state: texture, isLoading, error } = useLoader(
                 :hover="mouseHover"
                 :limit="GROUND_SIZE / 2 - 1"/>
 
-            <TresGroup :position="[2,0,2]" cast-shadow>
-                <Model :path="'/glbModels/yorha_number_2_type_b.glb'" cast-shadow/>
-            </TresGroup>
+            <CollisionShape3D :position="[-5,0.9,8]" :scale="[0.8,0.7,0.3]"/>
 
-            <GLTFModel path="/glbModels/Morgana/scene.gltf" :scale="[0.01,0.01,0.01]"/>
-            <!--with out animations-->
+            <StaticModel :path="'/glbModels/yorha_number_2_type_b.glb'" :position="[2,0,3]" cast-shadow>
+            </StaticModel>
+
+            <StaticModel :path="'/glbModels/Morgana/scene.gltf'" :position="[4,0,3]" :scale="[0.01,0.01,0.01]" cast-shadow/>
 
             <Suspense>
-                <Helicopter />
+                <DynamicModel :path="'/glbModels/Helicopter/animated_civilian_helicopter/scene.gltf'" :position="[2,0,4]" cast-shadow/>
             </Suspense>
-
         </TresCanvas>
     </div>
 </template>

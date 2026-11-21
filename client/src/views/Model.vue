@@ -1,13 +1,13 @@
 <script setup>
-import { computed } from 'vue'
-import { useGLTF } from '@tresjs/cientos'
+import { computed } from 'vue';
+import { useGLTF  } from '@tresjs/cientos';
 
 const props = defineProps({ 
   path: {type: String},
   dracoParam: {type: Boolean, default: false},//Whether to enable Draco compression
 }) ;
 
-const { state } = useGLTF(props.path, { draco: props.dracoParam });
+const { state } = useGLTF(props.path, { draco: props.dracoParam }); //napotkał rozszerzenie KHR_materials_pbrSpecularGlossiness
 const scene = computed(() => { return state?.value?.scene ?? state?.scene});
 
 //https://gltf-viewer.donmccurdy.com/
