@@ -1,0 +1,17 @@
+openapi: 3.2.1
+info:
+  title: Machinae JS API
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3000
+
+paths:
+  /api/firebase-config:
+    get:
+      summary: Gets an firebase configuration
+      responses:
+        '200':
+          description: Gotten firebase configuration
+        '404':
+          description: Missing firebase configuration
