@@ -262,8 +262,8 @@ onUnmounted(() => {
     <TresGroup :rotation="[0, modelYaw, 0]" :scale="[scale, scale, scale]" cast-shadow>
       <Model :path="path" cast-shadow/>
       <CollisionShape3D 
-      :position="[0,playerRef?.position?.y+1,0]"
-      :scale="[0.55,1.9,0.55]"
+        :position="[0,playerRef?.position?.y+1,0]"
+        :scale="[0.55,1.9,0.55]"
       />
     </TresGroup>
   </TresGroup>

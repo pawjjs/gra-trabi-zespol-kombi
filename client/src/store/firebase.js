@@ -55,8 +55,6 @@ export const useFirebase = defineStore('firebase', () =>
   );
   watch(userSnapshot, async (to, from) => 
   {
-    console.log(to?.online); //user with updated param
-    console.log(from);//undefined
     if (!from || !to)
     {
       return;

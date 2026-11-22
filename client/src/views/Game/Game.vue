@@ -3,32 +3,33 @@ import {
     onMounted,onUnmounted, 
     ref, computed , 
     watch,watchEffect,
-    useTemplateRef, 
-    shallowRef}                                                 from 'vue';
+    useTemplateRef,
+    shallowRef,}                                                from 'vue';
 import { usePointerLock }                                       from '@vueuse/core';
 import * as THREE                                               from 'three';
 import { TresCanvas, useLoader }                                from '@tresjs/core';
 import { EffectComposer, UnrealBloom }                          from '@tresjs/post-processing';
-import { useGLTF, GLTFModel , useAnimations , Stats,StatsGl,OrbitControls}    from '@tresjs/cientos';
-
-import { io } from "socket.io-client";
+import { Html, GLTFModel , useAnimations , Stats,StatsGl,OrbitControls}    from '@tresjs/cientos';
 import { useFirebase } from '../../store/firebase.js';
 import { doc, getDoc } from 'firebase/firestore';
 import { storeToRefs } from "pinia";
 import { useRouter } from 'vue-router';
+import { io } from "socket.io-client";
 
 import Player from '../Player.vue';
 import Model from '../Model.vue';
 import StaticModel from '../../components/Tres3D/StaticModel.vue';
+import CollisionShape3D from '../../components/Tres3D/CollisionShape3D.vue';
 //-----------------------------------------------------------------------------------------------
 const firebase = useFirebase();
 
 const router = useRouter();
 watchEffect(async () => {
     if(!firebase.isAuthenticated){
-        router.push('/login');
+        router.push('/');
     }    
 })
+
 
 const { user } = storeToRefs(firebase);
 const userDetails = ref(null);
@@ -42,28 +43,36 @@ const fetchUserData = async () =>
     }
 };
 
-const players = shallowRef([]);
-const xd = ref(false);
-
+const players = ref({});
 const socket = io("http://localhost:3000", {
     auth: { userID: user.value.uid },
   //auth: { token: "twoj-token" },
   //autoConnect: true,
 });
 
+socket.on('get players', (allPlayers)=>{
+    players.value = allPlayers;
+    console.log("Prev:");
+    console.log(players.value);
+});
+
+socket.on('entered world', (player) => {
+    if(!players.value[user.value.uid]){
+        players.value[user.value.uid] = player;
+        console.log("Hello " , players.value[user.value.uid].name);
+        console.log("Actual:");
+        console.log(players.value);
+    }
+});
+
 
 onMounted(async () => {
     await fetchUserData();
+    socket.emit('fetch players'); 
     socket.emit('enter world', userDetails.value.playerNick);
-
-    socket.on('entered world', (msg) => {
-        players.value.push(msg);
-        console.log(players.value);
-        if(players.value.length == 2){
-            xd.value = true;
-        }
-    });
+    
 });
+
 
 //onUnmounted(() => socket?.close());
 
@@ -91,6 +100,10 @@ const GROUND_SIZE = 450;
 
 //});
 
+
+//<StaticModel :path="'/glbModels/Morgana/scene.gltf'" :position="[-104,20,3]"  cast-shadow/>
+const skyColor = 0x6693A6;
+const groundColor = 0xA0101;
 </script>
 
 <template>
@@ -98,28 +111,39 @@ const GROUND_SIZE = 450;
     @mouseleave="() => {mouseHover = 0;}"
     @mousemove="() => {mouseHover = 1;}"
     >
-        <TresCanvas clear-color="black" @mousedown.capture="">
+        <TresCanvas clear-color="#abfbff" @mousedown.capture="">
             <StatsGl />
             <OrbitControls/>
-            
-            <TresAmbientLight :intensity="1" cast-shadow />
-
-            <TresDirectionalLight :position="[5, 8, 5]" :intensity="2.5" />
-
-            <TresDirectionalLight :position="[0, 2, 0]" :intensity="10.2" cast-shadow :color="'teal'"/>
-
+            <TresAmbientLight :intensity="1" :color="'white'" cast-shadow />
+            <TresHemisphereLight :args="[skyColor, groundColor, 10]" :position="[0,100,0]"/>
+            <TresDirectionalLight :position="[-51, 60, -57]" :intensity="11.5" :color="'orange'" ref="sunLight" >
+                <Html><div class="light-html">☀️</div></Html>
+                <CollisionShape3D :scale="[1,1,1]" :position="[0,0,0]"/>
+            </TresDirectionalLight>
             <GLTFModel 
                 path="/glbModels/City2/KosowLacki.glb" 
-                :position="[0,-25,0]"
+                :position="[0,0,0]"
                 :scale="[4,4,4]"
                 :rotation="[-Math.PI/2,0,0]"/>
 
-            <StaticModel v-if="xd" :path="'/glbModels/Morgana/scene.gltf'" :position="[4,20,3]"  cast-shadow/>
-
-           
- 
 
 
+            <GLTFModel 
+            v-for="player in players"
+                path="/glbModels/2b_low_poly.glb" 
+                :position="[player.position.x,25,player.position.z]"
+                :scale="[4,4,4]"
+                :rotation="[0,Math.PI,0]"
+                cast-shadow>
+            </GLTFModel>
+
+
+
+            
+
+
+
+            <StaticModel :path="'/glbModels/City2//Buildings/building04/building04.gltf'" :position="[64,25,3]" cast-shadow/>
         </TresCanvas>
     </div>
 </template>
@@ -139,6 +163,11 @@ h1{
     width: 99.4%;
     height: 98%;
     padding: 0.3vw;
+}
+
+.light-html{
+    background: wheat;
+    border: 2px black solid;
 }
 
 </style>

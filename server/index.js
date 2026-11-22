@@ -1,7 +1,6 @@
 import express from 'express';
 import swaggerUi from "swagger-ui-express";
 import YAML from "yaml";
-import { WebSocketServer } from 'ws';
 import { Server } from 'socket.io';
 import http from 'node:http';
 import { readFileSync } from "node:fs";
@@ -22,7 +21,6 @@ const io = new Server(server,{
     methods: ["GET", "POST"],
   },
 });
-//const wss = new WebSocketServer({server:server});
 
 // <Middleware>:
 app.use(express.json());//Ability thats gives POST data as JSON's. Parsing request body in JSON format:
@@ -43,19 +41,27 @@ app.use("/machines-api-docs", swaggerUi.serve, swaggerUi.setup(spec));
   close -Fired when the connection is closed
 */
 
-let players = Array();
+let players = {};
 
 io.on('connection', (socket) => {
-  console.log('A user connected');
 
+  //Player enters to the world
   socket.on('enter world', (playerNick) => {
-      console.log(playerNick);
-      console.log(socket.handshake.auth.userID);
+    const key = socket.handshake.auth.userID;
+    if(!players[key])
+    {
+      console.log('Hello '+ playerNick);
       const joinedPlayer = new Player();
+      joinedPlayer.randomPos();
       joinedPlayer.setName(playerNick);
-      players.push(joinedPlayer);
+      players[key] = joinedPlayer;
+      io.emit('entered world', players[key]);
+    }
+  });
 
-      io.emit('entered world', joinedPlayer);
+  //Getting all players on the world
+  socket.on('fetch players', () => {
+    io.emit('get players', players );
   });
 });
 

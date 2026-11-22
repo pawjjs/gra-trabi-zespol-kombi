@@ -133,7 +133,6 @@ const handleSubmitLogin = async (e) => {
     const jsonResponse = await useApiRequest('POST', '/api/firebase-claim-token', { x: 8 })
     .catch((err) => { throw err }) 
     
-    console.log("Login Success");
     router.push('/home');
   } 
   catch (error) 
